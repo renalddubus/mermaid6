@@ -15,7 +15,56 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  workflow-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Vérifier les workflows et le script Docker
+        run: |
+          docker run --rm -v "$PWD:/repo:ro" -w /repo rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+          docker run --rm --entrypoint shellcheck -v "$PWD:/repo:ro" -w /repo rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 scripts/verify-image.sh
+
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Vérifier le formatage
+        run: npm run format:check
+      - name: Vérifier le lint
+        run: npm run lint
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Vérifier le typage et compiler
+        run: npm run build
+
+  release-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .node-version
+      - name: Vérifier la préparation des releases
+        run: npm run test:release
+
+  e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -24,15 +73,7 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
-      - name: Vérifier les workflows et le script Docker
-        run: |
-          docker run --rm -v "$PWD:/repo:ro" -w /repo rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
-          docker run --rm --entrypoint shellcheck -v "$PWD:/repo:ro" -w /repo rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 scripts/verify-image.sh
       - run: npm ci
-      - name: Formatage, lint, typage et compilation
-        run: npm run check
-      - name: Vérifier la préparation des releases
-        run: npm run test:release
       - name: Installer Chromium
         run: npx playwright install --with-deps chromium
       - name: Construire et démarrer le conteneur
@@ -49,3 +90,15 @@ jobs:
       - name: Arrêter le conteneur
         if: always()
         run: docker compose down
+
+  # Conserver un statut unique exigeant la réussite de tous les contrôles.
+  check:
+    needs: [workflow-lint, lint, build, release-tests, e2e]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Vérifier le résultat de tous les jobs
+        env:
+          ALL_CHECKS_PASSED: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'skipped') }}
+        run: test "$ALL_CHECKS_PASSED" = "true"
