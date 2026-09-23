@@ -1,4 +1,4 @@
-FROM node:24-alpine AS build
+FROM --platform=$BUILDPLATFORM node:24-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
 RUN npm ci --no-audit --no-fund
@@ -6,7 +6,14 @@ COPY . .
 RUN npm run build
 
 FROM nginxinc/nginx-unprivileged:stable-alpine AS runtime
-LABEL org.opencontainers.image.title="Mermaid6" \
+ARG VERSION=dev
+ARG REVISION=unknown
+ARG SOURCE=local
+LABEL org.opencontainers.image.version="$VERSION" \
+      org.opencontainers.image.revision="$REVISION" \
+      org.opencontainers.image.source="$SOURCE" \
+      org.opencontainers.image.url="$SOURCE" \
+      org.opencontainers.image.title="Mermaid6" \
       org.opencontainers.image.description="Éditeur de diagrammes Mermaid auto-hébergé" \
       org.opencontainers.image.licenses="MIT"
 COPY docker/default.conf /etc/nginx/conf.d/default.conf

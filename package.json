@@ -17,7 +17,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run format:check && npm run lint && npm run build",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:release": "node --test scripts/release.test.js"
   },
   "dependencies": {
     "@codemirror/commands": "6.11.1",

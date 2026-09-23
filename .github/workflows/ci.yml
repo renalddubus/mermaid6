@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
@@ -23,9 +24,15 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
+      - name: Vérifier les workflows et le script Docker
+        run: |
+          docker run --rm -v "$PWD:/repo:ro" -w /repo rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+          docker run --rm --entrypoint shellcheck -v "$PWD:/repo:ro" -w /repo rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 scripts/verify-image.sh
       - run: npm ci
       - name: Formatage, lint, typage et compilation
         run: npm run check
+      - name: Vérifier la préparation des releases
+        run: npm run test:release
       - name: Installer Chromium
         run: npx playwright install --with-deps chromium
       - name: Construire et démarrer le conteneur
