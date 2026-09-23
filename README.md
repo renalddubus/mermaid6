@@ -18,7 +18,7 @@ Le rendu est local, en mode strict verrouillé, avec nettoyage du SVG et restric
 
 « Exporter l’image » télécharge un SVG vectoriel ou un PNG en résolution 1×, 2× ou 3×, indépendamment du zoom. Choisir un fond blanc, sombre, transparent ou personnalisé ; les couleurs du diagramme sont conservées. Le nom reprend celui du fichier `.mmd` importé. Tout se passe dans le navigateur.
 
-L’export attend un aperçu valide du code courant. Le PNG est limité à 16 384 pixels par côté et 32 millions de pixels ; choisir une résolution inférieure ou le SVG au-delà. Les ressources externes ne sont pas exportées. Les 35 exemples disposent de tests de téléchargement, de conservation des textes et de comparaison SVG/PNG sous Chromium. Firefox et Safari restent à valider.
+L’export attend un aperçu valide du code courant. Le PNG est limité à 16 384 pixels par côté et 32 millions de pixels ; choisir une résolution inférieure ou le SVG au-delà. Les ressources externes ne sont pas exportées. Les 35 exemples disposent de tests de téléchargement, de conservation des textes et de comparaison SVG/PNG sous Chromium. Safari est validé manuellement par le porteur du projet ; la validation Firefox est reportée à plus tard à sa demande.
 
 ## Fichiers et brouillon
 
