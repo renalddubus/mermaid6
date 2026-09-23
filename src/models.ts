@@ -68,9 +68,24 @@ export const models: {
 ];
 
 export function getSource(
-  model: (typeof models)[number],
+  model: { source: string; colors?: string },
   ink: (typeof inks)[number],
 ) {
+  const palette =
+    model.colors === 'actors'
+      ? `
+    actorBkg: '${ink.wash}'
+    actorBorder: '${ink.color}'
+    actorTextColor: '#292923'`
+      : model.colors === 'pie'
+        ? "\n    pie1: '#d93655'\n    pie2: '#3158bc'\n    pie3: '#28715b'"
+        : model.colors === 'branches'
+          ? "\n    cScale1: '#ffe7ed'\n    cScale2: '#dde5f7'\n    cScale3: '#dce9df'"
+          : model.colors === 'journey'
+            ? "\n    fillType0: '#ffe7ed'\n    fillType1: '#dde5f7'\n    fillType2: '#dce9df'"
+            : model.colors === 'sections'
+              ? "\n    cScale0: '#ffe7ed'\n    cScale1: '#dde5f7'\n    cScale2: '#dce9df'"
+              : '';
   return `---
 config:
   theme: base
@@ -78,7 +93,7 @@ config:
     primaryColor: '${ink.wash}'
     primaryTextColor: '#292923'
     primaryBorderColor: '${ink.color}'
-    lineColor: '${ink.color}'
+    lineColor: '${ink.color}'${palette}
 ---
 ${model.source}
 `;
