@@ -105,8 +105,8 @@ export default function App() {
           <a href="#examples">Les exemples</a>
           <a href="#about">Le projet</a>
         </nav>
-        <a className="button primary header-cta" href="#workspace">
-          Découvrir l’outil <Icon name="arrow" />
+        <a className="button primary header-cta" href="/editor">
+          Ouvrir l’éditeur <Icon name="arrow" />
         </a>
       </header>
       <main>
@@ -202,6 +202,12 @@ export default function App() {
               <p>{model.description}</p>
             </div>
             <div className="workspace-actions">
+              <a
+                className="button primary"
+                href={`/editor?example=${model.id}&ink=${inkIndex}`}
+              >
+                Modifier cet exemple <Icon name="arrow" />
+              </a>
               <button
                 ref={sourceButton}
                 className={`button ${sourceOpen ? 'active' : ''}`}
@@ -368,7 +374,7 @@ export default function App() {
           <p>
             <strong>À explorer</strong> Passez d’un exemple à l’autre, changez
             ses couleurs et emportez sa source Mermaid.
-            <span> L’édition en direct arrive prochainement.</span>
+            <span> Ouvrez l’éditeur pour modifier cet exemple en direct.</span>
           </p>
         </div>
         <section className="about" id="about" aria-labelledby="about-title">

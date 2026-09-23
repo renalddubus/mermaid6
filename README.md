@@ -4,7 +4,15 @@ Application web open source pour créer, éditer, personnaliser et exporter des 
 
 ## État du projet
 
-Le socle React/TypeScript/Vite fournit une page d’accueil responsive inspirée d’Apple Music : navigation horizontale, présentation du projet, galerie d’exemples avec recherche et accents corail. Il inclut un conteneur Docker et une CI. L’atelier permet d’explorer trois modèles illustrés, de changer l’encre, de zoomer et de consulter, copier ou télécharger leur source `.mmd`. Les aperçus sont des illustrations SVG ; le rendu Mermaid en direct, l’édition et les exports d’images seront développés dans les epics suivants.
+Le socle React/TypeScript/Vite fournit une page d’accueil responsive inspirée d’Apple Music : navigation horizontale, présentation du projet, galerie d’exemples avec recherche et accents corail. Il inclut un conteneur Docker et une CI. L’atelier permet d’explorer trois modèles illustrés, de changer l’encre, de zoomer et de consulter, copier ou télécharger leur source `.mmd`. Les aperçus de l’accueil restent des illustrations SVG. Le bouton « Modifier cet exemple » ouvre maintenant le véritable éditeur Mermaid à `/editor`.
+
+## Éditeur
+
+CodeMirror propose la coloration syntaxique, l’annulation et un aperçu Mermaid 12 après 300 ms de pause. Une erreur conserve le code et le dernier aperçu valide, clairement signalé. Sur mobile, des onglets basculent entre source et aperçu. Thèmes, couleurs globales, zoom, copie et téléchargement `.mmd` sont disponibles ; la configuration est conservée dans le frontmatter YAML, avec les commentaires et styles du diagramme.
+
+Trois exemples sont vérifiés en rendu : flux, séquence et états. Les autres types natifs restent saisissables, mais leur catalogue et leur validation complète sont prévus dans la story 2.2. Les couleurs dépendent du type et les styles par élément passent par la syntaxe Mermaid. Le brouillon automatique, l’import et les exports PNG/SVG restent à réaliser : **téléchargez la source avant de quitter**. Une alerte protège les modifications non téléchargées.
+
+Le rendu est local, en mode strict verrouillé, avec nettoyage du SVG et restriction des ressources externes. Les liens interactifs et les libellés HTML sont désactivés ; les images ne sont pas conservées dans l’aperçu. Limites : 50 000 caractères et 500 liens pour les moteurs qui appliquent cette limite Mermaid. L’override `lodash-es` fixe une dépendance transitive de Mermaid à une version corrigée ; à réévaluer lors de sa prochaine mise à jour.
 
 ## Développement
 
@@ -47,7 +55,7 @@ Le port est exposé sur la boucle locale ; pour un accès distant, configurer un
 
 ## Intégration continue
 
-Le workflow [CI](.github/workflows/ci.yml) s’exécute sur les pull requests et les pushes vers `main`. Il vérifie le code, construit l’image, attend son état sain, contrôle l’exécution sans root et teste l’application sur des dimensions de bureau et de mobile avec Chromium. Il vérifie aussi la santé HTTP et la distribution des ressources compilées.
+Le workflow [CI](.github/workflows/ci.yml) s’exécute sur les pull requests et les pushes vers `main`. Il vérifie le code, construit l’image, attend son état sain, contrôle l’exécution sans root et teste l’application sur des dimensions de bureau et de mobile avec Chromium. Les tests couvrent aussi l’édition, la reprise après erreur, les thèmes, le téléchargement de source, le clavier, la sécurité du rendu, les réponses dépassées, la santé HTTP et les ressources compilées.
 
 Les releases des sources et la publication sur GHCR seront ajoutées dans l’epic 4.
 
