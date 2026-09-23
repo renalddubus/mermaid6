@@ -16,4 +16,6 @@ Chaque ligne est une story courte ; les critères détaillés restent dans le [P
 
 **Validation MVP.** Sur les navigateurs cibles Chrome, Firefox et Safari, vérifier le parcours exemple → édition → couleurs → PNG/SVG, un import invalide et le brouillon local. Automatiser les contrôles de rendu/export par type ; compléter par une vérification visuelle. Tester ensuite l'image publiée avec le démarrage documenté.
 
-**Prochaine étape.** Démarrer l'epic 1 ; préciser chaque story au moment de l'implémenter.
+**Suivi — 23 septembre 2026.** Epic 1 réalisé : stories 1.1 et 1.2 terminées. Page React/TypeScript, licence MIT, contrôles de code, image Docker sans root et workflow CI disponibles. Compilation, santé Docker et trois tests Chromium (bureau, mobile, serveur) vérifiés localement. Le workflow GitHub Actions reste à exécuter après publication du dépôt sur GitHub.
+
+**Prochaine étape.** Epic 2, story 2.1 : éditeur Mermaid avec aperçu, erreurs et zoom.

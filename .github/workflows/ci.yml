@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Formatage, lint, typage et compilation
+        run: npm run check
+      - name: Installer Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Construire et démarrer le conteneur
+        run: docker compose up --build --wait --wait-timeout 90
+      - name: Vérifier l’utilisateur du conteneur
+        run: test "$(docker compose exec -T app id -u)" != "0"
+      - name: Vérifier l’application et le serveur Docker
+        run: npm test
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:8080
+      - name: Journaux Docker
+        if: failure()
+        run: docker compose logs
+      - name: Arrêter le conteneur
+        if: always()
+        run: docker compose down

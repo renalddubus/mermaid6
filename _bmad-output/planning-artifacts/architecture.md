@@ -16,7 +16,7 @@ Orientations validées dans le cadrage BMAD le 23 septembre 2026. Les choix expl
 - Image construite en plusieurs étapes, exécutée sans privilèges root ; exemple Docker Compose et contrôle de santé. Aucun volume nécessaire au MVP.
 - Pull requests : formatage, typage, tests utiles, compilation et démarrage du conteneur.
 - Tag `vX.Y.Z` : après validation, créer une GitHub Release avec archives des sources et sommes de contrôle ; publier l'image correspondante sur GHCR pour `linux/amd64` et `linux/arm64`.
-- Associer tag, commit et image ; réserver `latest` aux versions stables. Ajouter le fichier `LICENSE` MIT au démarrage du code.
+- Associer tag, commit et image ; réserver `latest` aux versions stables. Le fichier `LICENSE` MIT est fourni depuis l'epic 1.
 
 ## Extension premium
 
