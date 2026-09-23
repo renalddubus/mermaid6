@@ -20,4 +20,6 @@ Chaque ligne est une story courte ; les critères détaillés restent dans le [P
 
 **Édition — story 2.1 réalisée.** Éditeur CodeMirror à `/editor`, Mermaid 12, rendu temporisé, erreurs avec dernier aperçu signalé, zoom et bascule mobile. Thèmes et couleurs amorcent la story 2.2. Vérification Chromium sur Docker : édition, clavier, sources invalides, sécurité, personnalisation et téléchargements ; contrôle visuel bureau/mobile. Mesure locale sur macOS arm64, Chromium 153.0.8010.12, moteur déjà chargé : flowchart de 100 nœuds en chaîne rendu en 871 ms, saisie automatisée et temporisation incluses (mesure indicative, sans bridage CPU). Firefox et Safari restent à vérifier pour la validation MVP.
 
-**Prochaine étape.** Story 2.2 : élargir les exemples, établir le catalogue de compatibilité et documenter les limites par type. La validation des exports suivra dans la story 3.2.
+**Catalogue — story 2.2 réalisée.** 35 exemples classés par usage, recherche, aperçus Mermaid et sélection depuis l’éditeur. Palettes adaptées au type, sources préservées et limites détaillées dans le [catalogue de rendu](../../docs/diagrammes.md). Matrice Chromium : rendu Personnalisé/Sombre, effet visible des couleurs et parcours bureau/mobile. La validation d’export reste dans la story 3.2 ; C4 hors Context et ZenUML ne sont pas annoncés compatibles.
+
+**Prochaine étape.** Story 3.1 : importer un `.mmd` et restaurer le brouillon local après rechargement.

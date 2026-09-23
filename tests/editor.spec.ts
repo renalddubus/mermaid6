@@ -11,7 +11,6 @@ const ready = (page: Page) =>
 async function edit(page: Page, source: string) {
   await code(page).fill(source);
   await ready(page);
-  await expect(page.locator('.stale-warning')).toHaveCount(0);
 }
 
 test('l’accueil transmet son exemple à l’éditeur', async ({ page }) => {
@@ -36,7 +35,7 @@ test('édition, erreur, reprise, zoom et téléchargement de la source', async (
   const validSVG = await page.locator('.svg-content').innerHTML();
   await code(page).fill('flowchart LR\n A[Non terminé');
   await expect(page.getByRole('alert')).toContainText('Erreur de syntaxe');
-  await expect(page.locator('.stale-warning')).toBeVisible();
+  await expect(page.locator('.render-status')).toHaveText('Erreur à corriger');
   expect(await page.locator('.svg-content').innerHTML()).toBe(validSVG);
   await expect(code(page)).toContainText('Non terminé');
   const source = 'flowchart LR\n A[Corrigé] --> B[Prêt]';
@@ -139,7 +138,7 @@ test('les sources trop longues sont refusées sans perdre le code ni le dernier 
   await expect(page.getByRole('alert')).toBeVisible();
   await page.getByText('Détails de l’erreur', { exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('50 000 caractères');
-  await expect(page.locator('.stale-warning')).toBeVisible();
+  await expect(page.locator('.render-status')).toHaveText('Erreur à corriger');
   await edit(page, 'flowchart LR\n A --> B');
 });
 

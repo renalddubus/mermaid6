@@ -1,21 +1,28 @@
 import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import Icon from '../components/Icon';
-import { getSource, inks, models } from '../models';
+import { getSource, inks } from '../models';
+import {
+  catalogue,
+  categories,
+  exampleForSource,
+  type DiagramExample,
+} from '../catalogue';
+import CatalogueDialog from '../components/CatalogueDialog';
 import CodeEditor from './CodeEditor';
-import { changeAppearance, readAppearance, themes } from './appearance';
+import {
+  changeAppearance,
+  readAppearance,
+  themes,
+  colorFields,
+} from './appearance';
 import { describeError, MAX_SOURCE_LENGTH, renderDiagram } from './render';
 import './editor.css';
 
-const labels = [
-  'Flux — De l’idée au partage',
-  'Séquence — Une conversation',
-  'États — Cycle de vie',
-];
 function initialSource() {
   const params = new URLSearchParams(window.location.search);
   const model =
-    models.find((item) => item.id === params.get('example')) ?? models[0];
+    catalogue.find((item) => item.id === params.get('example')) ?? catalogue[0];
   const ink = inks[Number(params.get('ink'))] ?? inks[0];
   return getSource(model, ink);
 }
@@ -32,8 +39,11 @@ export default function EditorPage() {
   const [zoom, setZoom] = useState(100);
   const [mobilePanel, setMobilePanel] = useState('code');
   const [notice, setNotice] = useState('');
-  const [replacement, setReplacement] = useState<number | null>(null);
-  const appearance = readAppearance(source);
+  const [replacement, setReplacement] = useState<DiagramExample | null>(null);
+  const [catalogueOpen, setCatalogueOpen] = useState(false);
+  const sourceExample = exampleForSource(source);
+  const fields = colorFields[sourceExample?.colors ?? 'code'];
+  const appearance = readAppearance(source, fields);
   const dirty = source !== saved;
   const current = lastValid.source === source;
   const error = attempt?.source === source ? attempt.error : null;
@@ -76,7 +86,7 @@ export default function EditorPage() {
 
   function configure(key: string, value: string) {
     try {
-      setSource(changeAppearance(source, key, value));
+      setSource(changeAppearance(source, key, value, fields));
       setNotice('');
     } catch (cause) {
       setNotice(
@@ -84,8 +94,8 @@ export default function EditorPage() {
       );
     }
   }
-  function loadExample(index: number) {
-    setSource(getSource(models[index], inks[0]));
+  function loadExample(example: DiagramExample) {
+    setSource(getSource(example, inks[0]));
     setReplacement(null);
     setZoom(100);
     setNotice('');
@@ -124,7 +134,7 @@ export default function EditorPage() {
           / <h1>Éditeur</h1>
         </span>
         <div className="editor-header-actions">
-          <a href="/#examples" className="editor-home">
+          <a href="/examples" className="editor-home">
             Les exemples
           </a>
           <button className="button primary" onClick={download}>
@@ -141,21 +151,35 @@ export default function EditorPage() {
               aria-label="Charger un exemple"
               value=""
               onChange={(event) => {
-                const index = Number(event.target.value);
-                if (dirty) setReplacement(index);
-                else loadExample(index);
+                const example = catalogue[Number(event.target.value)];
+                if (dirty) setReplacement(example);
+                else loadExample(example);
               }}
             >
               <option value="" disabled>
                 Choisir un exemple…
               </option>
-              {models.map((model, index) => (
-                <option key={model.id} value={index}>
-                  {labels[index]}
-                </option>
+              {categories.map((category) => (
+                <optgroup label={category} key={category}>
+                  {catalogue.map(
+                    (model, index) =>
+                      model.category === category && (
+                        <option key={model.id} value={index}>
+                          {model.label}
+                          {model.experimental ? ' · Expérimental' : ''}
+                        </option>
+                      ),
+                  )}
+                </optgroup>
               ))}
             </select>
           </label>
+          <button
+            className="button catalogue-toolbar-button"
+            onClick={() => setCatalogueOpen(true)}
+          >
+            Parcourir les exemples
+          </button>
           <span className="toolbar-divider" />
           <label className="editor-field">
             Thème
@@ -176,34 +200,43 @@ export default function EditorPage() {
             aria-label="Couleurs du diagramme"
             role="group"
           >
-            {(
-              [
-                { key: 'primaryColor', label: 'Fond des éléments' },
-                { key: 'primaryBorderColor', label: 'Contour des éléments' },
-                { key: 'primaryTextColor', label: 'Texte des éléments' },
-              ] as const
-            ).map((item) => (
+            {fields.map((item) => (
               <label key={item.key} title={item.label}>
                 <input
                   type="color"
                   aria-label={item.label}
-                  value={appearance[item.key]}
+                  value={appearance.colors[item.key]}
                   onChange={(event) => configure(item.key, event.target.value)}
                   disabled={appearance.theme !== 'base'}
                 />
-                <span>{item.label.split(' ')[0]}</span>
+                <span>
+                  {item.label
+                    .replace(' des éléments', '')
+                    .replace(' des participants', '')}
+                </span>
               </label>
             ))}
           </div>
           <span className="theme-note">
-            {appearance.theme === 'base'
-              ? 'Les options de couleur varient selon le diagramme.'
-              : 'Choisissez « Personnalisé » pour régler les couleurs.'}
+            {fields.length === 0
+              ? 'Couleurs spécifiques : voir les indications ci-dessous.'
+              : appearance.theme === 'base'
+                ? 'Couleurs enregistrées dans le code.'
+                : 'Choisissez « Personnalisé » pour régler les couleurs.'}
           </span>
         </div>
+        {sourceExample && (
+          <p className="example-guidance">
+            <strong>
+              {sourceExample.label}
+              {sourceExample.experimental ? ' · Expérimental' : ''}
+            </strong>
+            <span>{sourceExample.note}</span>
+          </p>
+        )}
         {replacement !== null && (
           <div className="replacement-notice" role="alert">
-            <p>Charger cet exemple remplacera votre code actuel.</p>
+            <p>Charger « {replacement.label} » remplacera votre code actuel.</p>
             <button className="button" onClick={() => setReplacement(null)}>
               Annuler
             </button>
@@ -289,11 +322,6 @@ export default function EditorPage() {
                 </details>
               </div>
             )}
-            {lastValid.svg && !current && (
-              <div className="stale-warning">
-                Aperçu précédent — ne correspond pas au code actuel.
-              </div>
-            )}
             <div
               className="live-preview-scroll"
               tabIndex={0}
@@ -365,6 +393,16 @@ export default function EditorPage() {
           </span>
         </footer>
       </main>
+      {catalogueOpen && (
+        <CatalogueDialog
+          onClose={() => setCatalogueOpen(false)}
+          onChoose={(example) => {
+            setCatalogueOpen(false);
+            if (dirty) setReplacement(example);
+            else loadExample(example);
+          }}
+        />
+      )}
       {notice && (
         <div className="announcement" role="status">
           <span>{notice}</span>

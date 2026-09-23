@@ -1,5 +1,6 @@
 import mermaid from 'mermaid';
 import DOMPurify from 'dompurify';
+import { normalizeSvgLabels } from './svgLabels';
 
 export const MAX_SOURCE_LENGTH = 50_000;
 let counter = 0;
@@ -45,13 +46,20 @@ export function renderDiagram(source: string, isCurrent: () => boolean) {
     container.setAttribute('aria-hidden', 'true');
     document.body.append(container);
     try {
-      const { svg } = await mermaid.render(
+      const { svg, diagramType } = await mermaid.render(
         `mermaid6-${++counter}`,
         source,
         container,
       );
       if (!isCurrent()) return null;
-      const safe = DOMPurify.sanitize(svg, {
+      const variables = mermaid.mermaidAPI.getConfig().themeVariables;
+      const normalized = normalizeSvgLabels(
+        svg,
+        diagramType === 'journey'
+          ? variables?.primaryTextColor
+          : variables?.textColor,
+      );
+      const safe = DOMPurify.sanitize(normalized, {
         USE_PROFILES: { svg: true, svgFilters: true },
         ADD_TAGS: ['style'],
         FORBID_TAGS: ['foreignObject', 'image', 'a'],

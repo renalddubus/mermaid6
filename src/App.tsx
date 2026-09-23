@@ -102,7 +102,7 @@ export default function App() {
           </span>
         </a>
         <nav aria-label="Navigation principale">
-          <a href="#examples">Les exemples</a>
+          <a href="/examples">Les exemples</a>
           <a href="#about">Le projet</a>
         </nav>
         <a className="button primary header-cta" href="/editor">
@@ -190,6 +190,9 @@ export default function App() {
               </button>
             </div>
           )}
+          <a className="catalogue-home-link" href="/examples">
+            Explorer le catalogue complet <Icon name="arrow" />
+          </a>
         </section>
         <section
           className="workspace"
