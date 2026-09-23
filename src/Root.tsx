@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import App from './App';
 
 const CataloguePage = lazy(() => import('./CataloguePage'));
-const EditorPage = lazy(() => import('./editor/EditorPage'));
+const EditorPage = lazy(() => import('./editor/EditorEntry'));
 
 export default function Root() {
   const path = window.location.pathname.replace(/\/$/, '');

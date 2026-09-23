@@ -415,3 +415,34 @@
     padding: 12px;
   }
 }
+
+.draft-start {
+  min-height: 80svh;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+}
+.draft-start section {
+  max-width: 620px;
+}
+.draft-start h1 {
+  font-size: 32px;
+  letter-spacing: -1px;
+}
+.draft-start p {
+  color: var(--muted);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.draft-start-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+.editor-header-actions {
+  flex-wrap: wrap;
+}
+.draft-filename {
+  overflow-wrap: anywhere;
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import Icon from '../components/Icon';
 import { getSource, inks } from '../models';
@@ -17,19 +17,30 @@ import {
   colorFields,
 } from './appearance';
 import { describeError, MAX_SOURCE_LENGTH, renderDiagram } from './render';
+import { writeDraft, type Draft } from './drafts';
+import { importSource } from './importSource';
 import './editor.css';
 
-function initialSource() {
-  const params = new URLSearchParams(window.location.search);
-  const model =
-    catalogue.find((item) => item.id === params.get('example')) ?? catalogue[0];
-  const ink = inks[Number(params.get('ink'))] ?? inks[0];
-  return getSource(model, ink);
-}
 type Failure = ReturnType<typeof describeError>;
 
-export default function EditorPage() {
-  const [source, setSource] = useState(initialSource);
+export default function EditorPage({
+  initial,
+  restored,
+  storageWarning,
+}: {
+  initial: Draft;
+  restored: boolean;
+  storageWarning: string;
+}) {
+  const [source, setSource] = useState(initial.source);
+  const [name, setName] = useState(initial.name);
+  const [persisted, setPersisted] = useState<{
+    source: string;
+    name: string;
+  } | null>(null);
+  const [storageError, setStorageError] = useState(storageWarning);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const importSequence = useRef(0);
   const [saved, setSaved] = useState(source);
   const [lastValid, setLastValid] = useState({ source: '', svg: '' });
   const [attempt, setAttempt] = useState<{
@@ -38,13 +49,25 @@ export default function EditorPage() {
   } | null>(null);
   const [zoom, setZoom] = useState(100);
   const [mobilePanel, setMobilePanel] = useState('code');
-  const [notice, setNotice] = useState('');
-  const [replacement, setReplacement] = useState<DiagramExample | null>(null);
+  const [notice, setNotice] = useState(
+    restored ? 'Brouillon restauré depuis ce navigateur.' : '',
+  );
+  const [replacement, setReplacement] = useState<{
+    label: string;
+    source: string;
+    name: string;
+  } | null>(null);
   const [catalogueOpen, setCatalogueOpen] = useState(false);
   const sourceExample = exampleForSource(source);
   const fields = colorFields[sourceExample?.colors ?? 'code'];
   const appearance = readAppearance(source, fields);
-  const dirty = source !== saved;
+  const dirty = source !== saved || restored;
+  const locallySaved = persisted?.source === source && persisted?.name === name;
+  const needsBackup = !locallySaved && source !== saved;
+  const latestSource = useRef(source);
+  useEffect(() => {
+    latestSource.current = source;
+  }, [source]);
   const current = lastValid.source === source;
   const error = attempt?.source === source ? attempt.error : null;
   const status = current
@@ -75,14 +98,80 @@ export default function EditorPage() {
     document.title = 'Mermaid6 — Éditeur';
   }, []);
   useEffect(() => {
-    if (!dirty) return;
+    if (!needsBackup) return;
     const warn = (event: BeforeUnloadEvent) => {
       event.preventDefault();
       event.returnValue = '';
     };
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
-  }, [dirty]);
+  }, [needsBackup]);
+
+  useEffect(() => {
+    if (storageWarning) return;
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      void writeDraft({
+        source,
+        name,
+        origin: initial.origin,
+        updatedAt: Date.now(),
+      })
+        .then(() => {
+          if (!cancelled) {
+            setPersisted({ source, name });
+            setStorageError('');
+          }
+        })
+        .catch(() => {
+          if (!cancelled)
+            setStorageError(
+              'Enregistrement local impossible. Téléchargez votre source pour la conserver.',
+            );
+        });
+    }, 350);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [source, name, initial.origin, storageWarning]);
+
+  async function openFile(file: File) {
+    const sequence = ++importSequence.current;
+    try {
+      const imported = await importSource(file);
+      if (sequence !== importSequence.current) return;
+      const candidate = { ...imported, label: file.name };
+      if (dirty || latestSource.current !== initial.source)
+        setReplacement(candidate);
+      else replaceDocument(candidate);
+    } catch (cause) {
+      if (sequence === importSequence.current)
+        setNotice(
+          cause instanceof Error
+            ? cause.message
+            : 'Lecture du fichier impossible.',
+        );
+    }
+  }
+  function replaceDocument(document: { source: string; name: string }) {
+    importSequence.current++;
+    setSource(document.source);
+    setName(document.name);
+    setReplacement(null);
+    setZoom(100);
+    setNotice('');
+  }
+  function chooseExample(example: DiagramExample) {
+    importSequence.current++;
+    const document = {
+      source: getSource(example, inks[0]),
+      name: 'mon-diagramme.mmd',
+      label: example.label,
+    };
+    if (dirty || source !== initial.source) setReplacement(document);
+    else replaceDocument(document);
+  }
 
   function configure(key: string, value: string) {
     try {
@@ -94,19 +183,13 @@ export default function EditorPage() {
       );
     }
   }
-  function loadExample(example: DiagramExample) {
-    setSource(getSource(example, inks[0]));
-    setReplacement(null);
-    setZoom(100);
-    setNotice('');
-  }
   function download() {
     const url = URL.createObjectURL(
       new Blob([source], { type: 'text/plain;charset=utf-8' }),
     );
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'mon-diagramme.mmd';
+    link.download = name;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     setSaved(source);
@@ -134,6 +217,21 @@ export default function EditorPage() {
           / <h1>Éditeur</h1>
         </span>
         <div className="editor-header-actions">
+          <input
+            ref={fileInput}
+            type="file"
+            accept=".mmd"
+            aria-label="Importer un fichier Mermaid"
+            hidden
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = '';
+              if (file) void openFile(file);
+            }}
+          />
+          <button className="button" onClick={() => fileInput.current?.click()}>
+            Importer .mmd
+          </button>
           <a href="/examples" className="editor-home">
             Les exemples
           </a>
@@ -152,8 +250,7 @@ export default function EditorPage() {
               value=""
               onChange={(event) => {
                 const example = catalogue[Number(event.target.value)];
-                if (dirty) setReplacement(example);
-                else loadExample(example);
+                chooseExample(example);
               }}
             >
               <option value="" disabled>
@@ -242,7 +339,7 @@ export default function EditorPage() {
             </button>
             <button
               className="button primary"
-              onClick={() => loadExample(replacement)}
+              onClick={() => replaceDocument(replacement)}
             >
               Remplacer le code
             </button>
@@ -383,10 +480,14 @@ export default function EditorPage() {
           </section>
         </div>
         <footer className="editor-bottom">
-          <span>
-            {dirty
-              ? 'Modifications non enregistrées. Téléchargez votre source avant de quitter.'
-              : 'Votre code reste dans ce navigateur. Téléchargez-le pour le conserver.'}
+          <span role="status" className={storageError ? 'over-limit' : ''}>
+            {storageError ||
+              (locallySaved
+                ? 'Brouillon enregistré dans ce navigateur.'
+                : 'Enregistrement du brouillon…')}
+          </span>
+          <span className="draft-filename">
+            {name} · Un seul brouillon local. Téléchargez-le pour le partager.
           </span>
           <span>
             Styles par élément : utilisez la syntaxe Mermaid dans le code.
@@ -398,8 +499,7 @@ export default function EditorPage() {
           onClose={() => setCatalogueOpen(false)}
           onChoose={(example) => {
             setCatalogueOpen(false);
-            if (dirty) setReplacement(example);
-            else loadExample(example);
+            chooseExample(example);
           }}
         />
       )}

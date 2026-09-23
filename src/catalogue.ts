@@ -648,6 +648,7 @@ export function normalizeSearch(value: string) {
 
 export function exampleForSource(source: string) {
   const body = source
+    .replace(/^\uFEFF/, '')
     .replace(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/, '')
     .replace(/%%[^\n]*/g, '')
     .trimStart();

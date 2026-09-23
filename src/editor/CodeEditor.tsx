@@ -34,6 +34,7 @@ export default function CodeEditor({
   const container = useRef<HTMLDivElement>(null);
   const view = useRef<EditorView | null>(null);
   const initial = useRef(value);
+  const syncing = useRef(false);
   const callback = useRef(onChange);
   useEffect(() => {
     callback.current = onChange;
@@ -54,7 +55,7 @@ export default function CodeEditor({
             spellcheck: 'false',
           }),
           EditorView.updateListener.of((update) => {
-            if (update.docChanged)
+            if (update.docChanged && !syncing.current)
               callback.current(update.state.doc.toString());
           }),
         ],
@@ -68,10 +69,16 @@ export default function CodeEditor({
   }, []);
   useEffect(() => {
     const editor = view.current;
-    if (editor && editor.state.doc.toString() !== value)
+    if (
+      editor &&
+      editor.state.doc.toString() !== value.replace(/\r\n?/g, '\n')
+    ) {
+      syncing.current = true;
       editor.dispatch({
         changes: { from: 0, to: editor.state.doc.length, insert: value },
       });
+      syncing.current = false;
+    }
   }, [value]);
   return <div className="code-editor" ref={container} />;
 }
