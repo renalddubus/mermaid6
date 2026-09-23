@@ -1,3 +1,4 @@
+import { changeAppearance, colorFields } from '../src/editor/appearance';
 import { expect, test, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
@@ -68,17 +69,36 @@ test('thèmes et couleurs conservent les commentaires et les styles du code', as
     page,
     '---\ntitle: Mon schéma\n# À conserver\nconfig:\n  flowchart:\n    curve: linear\n---\nflowchart LR\n A[Bonjour] --> B[Suite]\n classDef custom stroke-width:3px\n class B custom',
   );
-  await page
-    .getByRole('combobox', { name: 'Thème du diagramme' })
-    .selectOption('dark');
+  await edit(
+    page,
+    changeAppearance(
+      await code(page).innerText(),
+      'theme',
+      'dark',
+      colorFields.nodes,
+    ),
+  );
   await ready(page);
   await expect(page.locator('.live-preview-panel')).toHaveClass(/theme-dark/);
-  await expect(page.getByLabel('Fond des éléments')).toBeDisabled();
-  await page
-    .getByRole('combobox', { name: 'Thème du diagramme' })
-    .selectOption('base');
+  await edit(
+    page,
+    changeAppearance(
+      await code(page).innerText(),
+      'theme',
+      'base',
+      colorFields.nodes,
+    ),
+  );
   await ready(page);
-  await page.getByLabel('Fond des éléments').fill('#aabbcc');
+  await edit(
+    page,
+    changeAppearance(
+      await code(page).innerText(),
+      colorFields.nodes[0].key,
+      '#aabbcc',
+      colorFields.nodes,
+    ),
+  );
   await ready(page);
   await expect(code(page)).toContainText('À conserver');
   await expect(code(page)).toContainText('curve: linear');
@@ -86,9 +106,11 @@ test('thèmes et couleurs conservent les commentaires et les styles du code', as
   await expect(code(page)).toContainText('#aabbcc');
   const rect = page.locator('.svg-content .node rect').first();
   await expect(rect).toHaveCSS('fill', 'rgb(170, 187, 204)');
+  await page.getByRole('button', { name: 'Parcourir les exemples' }).click();
   await page
-    .getByRole('combobox', { name: 'Charger un exemple' })
-    .selectOption('1');
+    .getByRole('searchbox', { name: 'Rechercher dans le catalogue' })
+    .fill('sequence');
+  await page.getByRole('button', { name: 'Utiliser cet exemple' }).click();
   await expect(page.getByRole('alert')).toContainText('remplacera votre code');
   await page.getByRole('button', { name: 'Annuler', exact: true }).click();
   await expect(code(page)).toContainText('À conserver');
@@ -196,4 +218,26 @@ test('un rendu lent dépassé ne remplace pas la dernière saisie', async ({
   await expect(page.locator('.svg-content')).not.toContainText(
     'Ancienne saisie',
   );
+});
+
+test('les notifications disparaissent et une nouvelle action relance leur délai', async ({
+  page,
+}) => {
+  await page.goto('/editor');
+  await ready(page);
+  await page.clock.install();
+  const trigger = page.getByRole('button', {
+    name: 'Télécharger .mmd',
+    exact: true,
+  });
+  await trigger.click();
+  await expect(page.locator('.announcement')).toContainText(
+    'Source téléchargée.',
+  );
+  await page.clock.fastForward(3000);
+  await trigger.click();
+  await page.clock.fastForward(3000);
+  await expect(page.locator('.announcement')).toBeVisible();
+  await page.clock.fastForward(1000);
+  await expect(page.locator('.announcement')).toHaveCount(0);
 });

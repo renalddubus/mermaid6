@@ -72,7 +72,7 @@ export function renderDiagram(source: string, isCurrent: () => boolean) {
       element.setAttribute('height', '100%');
       element.setAttribute(
         'style',
-        'max-width: none; width: 100%; height: 100%;',
+        'max-width: none; width: 100%; height: 100%; font-family: Arial, sans-serif;',
       );
       element.setAttribute('role', 'img');
       element.setAttribute('aria-label', 'Diagramme Mermaid');

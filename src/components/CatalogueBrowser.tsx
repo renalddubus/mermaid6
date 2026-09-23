@@ -188,8 +188,8 @@ export default function CatalogueBrowser({
         </div>
       )}
       <p className="catalogue-footnote">
-        Exemples rendus avec Mermaid 12. Les exports d’images arrivent dans une
-        prochaine étape. ZenUML nécessite une extension non installée.
+        Exemples rendus avec Mermaid 12 et exportables en SVG ou PNG. ZenUML
+        nécessite une extension non installée.
       </p>
     </div>
   );

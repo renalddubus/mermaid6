@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { catalogue } from '../src/catalogue';
+import { changeAppearance, colorFields } from '../src/editor/appearance';
 
 for (const example of catalogue) {
   test(`rendu du catalogue : ${example.id}`, async ({ page }) => {
@@ -35,9 +36,15 @@ for (const example of catalogue) {
     }));
     expect(box.width).toBeGreaterThan(0);
     expect(box.height).toBeGreaterThan(0);
-    await page
-      .getByRole('combobox', { name: 'Thème du diagramme' })
-      .selectOption('dark');
+    const code = page.getByRole('textbox', { name: 'Code Mermaid' });
+    await code.fill(
+      changeAppearance(
+        await code.innerText(),
+        'theme',
+        'dark',
+        colorFields[example.colors],
+      ),
+    );
     await expect(page.locator('.render-status')).toHaveText('Aperçu à jour');
     await expect(svg).toBeVisible();
     if (example.id === 'journey')
@@ -132,10 +139,18 @@ for (const example of catalogue.filter((item) => item.colors !== 'code')) {
   test(`couleurs visibles : ${example.id}`, async ({ page }) => {
     await page.goto(`/editor?example=${example.id}`);
     await expect(page.locator('.render-status')).toHaveText('Aperçu à jour');
-    const fields = page.locator('.editor-colors input');
-    for (let index = 0; index < (await fields.count()); index++) {
+    const fields = colorFields[example.colors];
+    const code = page.getByRole('textbox', { name: 'Code Mermaid' });
+    for (let index = 0; index < fields.length; index++) {
       const color = ['#aabbcc', '#cc8844', '#775599'][index];
-      await fields.nth(index).fill(color);
+      await code.fill(
+        changeAppearance(
+          await code.innerText(),
+          fields[index].key,
+          color,
+          fields,
+        ),
+      );
       await expect(page.locator('.render-status')).toHaveText('Aperçu à jour');
       const rgb = `rgb(${[1, 3, 5].map((start) => parseInt(color.slice(start, start + 2), 16)).join(', ')})`;
       expect(
@@ -155,7 +170,7 @@ for (const example of catalogue.filter((item) => item.colors !== 'code')) {
             }),
           rgb,
         ),
-        `${example.id} : ${await fields.nth(index).getAttribute('aria-label')} doit modifier un élément visible`,
+        `${example.id} : ${fields[index].label} doit modifier un élément visible`,
       ).toBe(true);
     }
   });
