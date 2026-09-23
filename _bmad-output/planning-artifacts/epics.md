@@ -24,4 +24,8 @@ Chaque ligne est une story courte ; les critères détaillés restent dans le [P
 
 **Fichiers — story 3.1 réalisée.** Import UTF-8 `.mmd`, téléchargement avec nom et configuration conservés, brouillon IndexedDB restauré après rechargement. Confirmation avant remplacement, état de sauvegarde et repli vers le téléchargement si le stockage échoue. Tests : aller-retour BOM/CRLF, syntaxe invalide, limites, saisie pendant l’import, restauration, stockage bloqué/quota et mobile.
 
-**Prochaine étape.** Story 3.2 : exporter en SVG et PNG, choisir le fond et la résolution, vérifier la fidélité par type.
+**Images — story 3.2 réalisée.** Exports SVG/PNG avec fond blanc, sombre, transparent ou personnalisé et résolution PNG 1×/2×/3×. Textes, couleurs, dimensions et téléchargements vérifiés sur les 35 exemples sous Chromium ; erreur de code, limite PNG, conversion échouée et mobile couverts. Firefox et Safari restent à vérifier pour le MVP.
+
+**Simplification de l’éditeur.** Catalogue ouvert depuis l’en-tête uniquement ; liste déroulante et barre de configuration retirées. Thèmes/couleurs modifiables dans le code. Notifications temporaires de quatre secondes.
+
+**Prochaine étape.** Story 4.1 : automatiser les releases des sources et la publication Docker sur GHCR.

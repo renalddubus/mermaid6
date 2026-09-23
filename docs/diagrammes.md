@@ -1,6 +1,6 @@
 # Catalogue de rendu — Mermaid 12.0.0
 
-Les 35 exemples sont accessibles sur `/examples` et depuis l’éditeur. Les tests Chromium vérifient un SVG avec texte et dimensions valides, dans les thèmes Personnalisé et Sombre. Chaque contrôle de couleur proposé est testé sur un élément visible. Cela valide ces exemples, pas toutes les syntaxes possibles. **Les exports PNG/SVG ne sont pas encore disponibles ni validés.**
+Les 35 exemples sont accessibles sur `/examples` et depuis l’éditeur. Les tests Chromium vérifient un SVG avec texte et dimensions valides, dans les thèmes Personnalisé et Sombre. Les variables de couleur documentées sont testées sur un élément visible ; elles se modifient dans le code Mermaid. Cela valide ces exemples, pas toutes les syntaxes possibles. Les téléchargements SVG/PNG des 35 exemples sont vérifiés sous Chromium : textes conservés et comparaison des pixels du PNG avec le SVG autonome.
 
 | Exemple                                                                              | Syntaxe              | Couleurs dans l’interface | Limites / personnalisation                                                                                                      |
 | ------------------------------------------------------------------------------------ | -------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
@@ -48,4 +48,4 @@ Les 35 exemples sont accessibles sur `/examples` et depuis l’éditeur. Les tes
 - Les thèmes globaux sont disponibles pour tous les exemples ; certaines couleurs sémantiques demandent les variables propres au type. Les commentaires et styles sont conservés dans le YAML et le corps Mermaid. Les styles locaux peuvent prendre le pas sur le thème.
 - Les libellés HTML produits malgré la configuration par certains moteurs sont convertis en texte SVG : mise en forme HTML simplifiée, texte conservé.
 - Mode strict : pas de liens interactifs, de libellés HTML, d’images dans le SVG final ni de packs d’icônes externes. Limites générales de 50 000 caractères et 500 liens lorsque le moteur Mermaid applique cette dernière limite.
-- Validation visuelle locale sur bureau et mobile avec Chromium. Firefox, Safari et la fidélité des futurs exports restent dans la validation finale du MVP.
+- Validation visuelle locale sur bureau et mobile avec Chromium. Firefox et Safari restent dans la validation finale du MVP. Le PNG accepte trois résolutions, jusqu’à 16 384 px par côté et 32 millions de pixels ; le SVG reste disponible au-delà.

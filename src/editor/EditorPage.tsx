@@ -2,23 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import Icon from '../components/Icon';
 import { getSource, inks } from '../models';
-import {
-  catalogue,
-  categories,
-  exampleForSource,
-  type DiagramExample,
-} from '../catalogue';
+import { exampleForSource, type DiagramExample } from '../catalogue';
 import CatalogueDialog from '../components/CatalogueDialog';
 import CodeEditor from './CodeEditor';
-import {
-  changeAppearance,
-  readAppearance,
-  themes,
-  colorFields,
-} from './appearance';
+import { readAppearance, colorFields } from './appearance';
 import { describeError, MAX_SOURCE_LENGTH, renderDiagram } from './render';
 import { writeDraft, type Draft } from './drafts';
 import { importSource } from './importSource';
+import ExportDialog from './ExportDialog';
+import { exportImage, downloadImage, type ImageOptions } from './exportImage';
 import './editor.css';
 
 type Failure = ReturnType<typeof describeError>;
@@ -49,15 +41,27 @@ export default function EditorPage({
   } | null>(null);
   const [zoom, setZoom] = useState(100);
   const [mobilePanel, setMobilePanel] = useState('code');
-  const [notice, setNotice] = useState(
-    restored ? 'Brouillon restauré depuis ce navigateur.' : '',
-  );
+  const [notice, setNoticeValue] = useState({
+    text: restored ? 'Brouillon restauré depuis ce navigateur.' : '',
+  });
+  function setNotice(text: string) {
+    setNoticeValue({ text });
+  }
+  useEffect(() => {
+    if (!notice.text) return;
+    const timer = setTimeout(() => setNoticeValue({ text: '' }), 4000);
+    return () => clearTimeout(timer);
+  }, [notice]);
   const [replacement, setReplacement] = useState<{
     label: string;
     source: string;
     name: string;
   } | null>(null);
   const [catalogueOpen, setCatalogueOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportBusy, setExportBusy] = useState(false);
+  const [exportError, setExportError] = useState('');
+  const exportAttempt = useRef(0);
   const sourceExample = exampleForSource(source);
   const fields = colorFields[sourceExample?.colors ?? 'code'];
   const appearance = readAppearance(source, fields);
@@ -173,16 +177,6 @@ export default function EditorPage({
     else replaceDocument(document);
   }
 
-  function configure(key: string, value: string) {
-    try {
-      setSource(changeAppearance(source, key, value, fields));
-      setNotice('');
-    } catch (cause) {
-      setNotice(
-        cause instanceof Error ? cause.message : 'Configuration invalide.',
-      );
-    }
-  }
   function download() {
     const url = URL.createObjectURL(
       new Blob([source], { type: 'text/plain;charset=utf-8' }),
@@ -195,6 +189,36 @@ export default function EditorPage({
     setSaved(source);
     setNotice('Source téléchargée.');
   }
+  async function saveImage(options: ImageOptions) {
+    if (!current || exportBusy) return;
+    const version = ++exportAttempt.current;
+    const snapshot = source;
+    setExportBusy(true);
+    setExportError('');
+    try {
+      const blob = await exportImage(lastValid.svg, options);
+      if (version !== exportAttempt.current) return;
+      if (latestSource.current !== snapshot)
+        throw new Error(
+          'Le code a changé. Attendez le nouvel aperçu et relancez l’export.',
+        );
+      downloadImage(blob, name, options.format);
+      setNotice(`Image ${options.format.toUpperCase()} téléchargée.`);
+    } catch (cause) {
+      if (version === exportAttempt.current)
+        setExportError(
+          cause instanceof Error ? cause.message : 'L’export a échoué.',
+        );
+    } finally {
+      if (version === exportAttempt.current) setExportBusy(false);
+    }
+  }
+  function closeExport() {
+    exportAttempt.current++;
+    setExportBusy(false);
+    setExportOpen(false);
+  }
+
   async function copy() {
     try {
       await navigator.clipboard.writeText(source);
@@ -232,9 +256,9 @@ export default function EditorPage({
           <button className="button" onClick={() => fileInput.current?.click()}>
             Importer .mmd
           </button>
-          <a href="/examples" className="editor-home">
-            Les exemples
-          </a>
+          <button className="button" onClick={() => setCatalogueOpen(true)}>
+            Parcourir les exemples
+          </button>
           <button className="button primary" onClick={download}>
             <Icon name="export" />
             Télécharger .mmd
@@ -242,86 +266,6 @@ export default function EditorPage({
         </div>
       </header>
       <main className="editor-main">
-        <div className="editor-toolbar">
-          <label className="editor-field">
-            Point de départ
-            <select
-              aria-label="Charger un exemple"
-              value=""
-              onChange={(event) => {
-                const example = catalogue[Number(event.target.value)];
-                chooseExample(example);
-              }}
-            >
-              <option value="" disabled>
-                Choisir un exemple…
-              </option>
-              {categories.map((category) => (
-                <optgroup label={category} key={category}>
-                  {catalogue.map(
-                    (model, index) =>
-                      model.category === category && (
-                        <option key={model.id} value={index}>
-                          {model.label}
-                          {model.experimental ? ' · Expérimental' : ''}
-                        </option>
-                      ),
-                  )}
-                </optgroup>
-              ))}
-            </select>
-          </label>
-          <button
-            className="button catalogue-toolbar-button"
-            onClick={() => setCatalogueOpen(true)}
-          >
-            Parcourir les exemples
-          </button>
-          <span className="toolbar-divider" />
-          <label className="editor-field">
-            Thème
-            <select
-              aria-label="Thème du diagramme"
-              value={appearance.theme}
-              onChange={(event) => configure('theme', event.target.value)}
-            >
-              {themes.map((theme) => (
-                <option key={theme.value} value={theme.value}>
-                  {theme.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div
-            className="editor-colors"
-            aria-label="Couleurs du diagramme"
-            role="group"
-          >
-            {fields.map((item) => (
-              <label key={item.key} title={item.label}>
-                <input
-                  type="color"
-                  aria-label={item.label}
-                  value={appearance.colors[item.key]}
-                  onChange={(event) => configure(item.key, event.target.value)}
-                  disabled={appearance.theme !== 'base'}
-                />
-                <span>
-                  {item.label
-                    .replace(' des éléments', '')
-                    .replace(' des participants', '')}
-                </span>
-              </label>
-            ))}
-          </div>
-          <span className="theme-note">
-            {fields.length === 0
-              ? 'Couleurs spécifiques : voir les indications ci-dessous.'
-              : appearance.theme === 'base'
-                ? 'Couleurs enregistrées dans le code.'
-                : 'Choisissez « Personnalisé » pour régler les couleurs.'}
-          </span>
-        </div>
         {sourceExample && (
           <p className="example-guidance">
             <strong>
@@ -448,7 +392,16 @@ export default function EditorPage({
               </div>
             </div>
             <footer className="live-preview-footer">
-              <span>Rendu local · Mermaid 12</span>
+              <button
+                className="button primary"
+                disabled={!current || !lastValid.svg}
+                onClick={() => {
+                  setExportError('');
+                  setExportOpen(true);
+                }}
+              >
+                Exporter l’image <Icon name="export" />
+              </button>
               <div
                 className="zoom-tools"
                 role="group"
@@ -494,6 +447,17 @@ export default function EditorPage({
           </span>
         </footer>
       </main>
+      {exportOpen && (
+        <ExportDialog
+          svg={lastValid.svg}
+          current={current}
+          dark={appearance.theme === 'dark'}
+          busy={exportBusy}
+          error={exportError}
+          onClose={closeExport}
+          onExport={(options) => void saveImage(options)}
+        />
+      )}
       {catalogueOpen && (
         <CatalogueDialog
           onClose={() => setCatalogueOpen(false)}
@@ -503,9 +467,9 @@ export default function EditorPage({
           }}
         />
       )}
-      {notice && (
+      {notice.text && (
         <div className="announcement" role="status">
-          <span>{notice}</span>
+          <span>{notice.text}</span>
           <button
             aria-label="Fermer la notification"
             onClick={() => setNotice('')}

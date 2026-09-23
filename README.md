@@ -8,11 +8,17 @@ Le socle React/TypeScript/Vite fournit une page d’accueil responsive inspirée
 
 ## Éditeur
 
-CodeMirror propose la coloration syntaxique, l’annulation et un aperçu Mermaid 12 après 300 ms de pause. Une erreur conserve le code et le dernier aperçu valide, clairement signalé. Sur mobile, des onglets basculent entre source et aperçu. Thèmes, couleurs globales, zoom, copie et téléchargement `.mmd` sont disponibles ; la configuration est conservée dans le frontmatter YAML, avec les commentaires et styles du diagramme.
+CodeMirror propose la coloration syntaxique, l’annulation et un aperçu Mermaid 12 après 300 ms de pause. Une erreur conserve le code et le dernier aperçu valide, clairement signalé. Sur mobile, des onglets basculent entre source et aperçu. Zoom, copie et téléchargement `.mmd` sont disponibles ; les thèmes et couleurs se modifient dans le code ; la configuration est conservée dans le frontmatter YAML, avec les commentaires et styles du diagramme.
 
-Le [catalogue](docs/diagrammes.md) propose **35 exemples** sur `/examples`, avec recherche, filtres par usage, aperçu réel et limites par type. Il s’ouvre aussi dans une fenêtre depuis l’éditeur, avec confirmation avant remplacement d’un travail modifié. Les exemples sont vérifiés dans deux thèmes ; les contrôles de couleur s’adaptent au type (éléments, participants, parts, branches ou sections). Les formats spécialisés proposent des indications de configuration dans le code. Les types expérimentaux sont signalés ; ZenUML n’est pas installé. La validation de rendu ne préjuge pas de celle des futurs exports. Les exports PNG/SVG restent à réaliser.
+Le [catalogue](docs/diagrammes.md) propose **35 exemples** sur `/examples`, avec recherche, filtres par usage, aperçu réel et limites par type. Le bouton « Parcourir les exemples » dans l’en-tête ouvre une fenêtre depuis l’éditeur, avec confirmation avant remplacement d’un travail modifié. Les exemples sont vérifiés dans deux thèmes ; les variables de couleur dépendent du type (éléments, participants, parts, branches ou sections). Les formats spécialisés proposent des indications de configuration dans le code. Les types expérimentaux sont signalés ; ZenUML n’est pas installé. Les exports PNG/SVG sont disponibles depuis l’aperçu.
 
 Le rendu est local, en mode strict verrouillé, avec nettoyage du SVG et restriction des ressources externes. Les liens interactifs et les libellés HTML sont désactivés ; les images ne sont pas conservées dans l’aperçu. Limites : 50 000 caractères et 500 liens pour les moteurs qui appliquent cette limite Mermaid. L’override `lodash-es` fixe une dépendance transitive de Mermaid à une version corrigée ; à réévaluer lors de sa prochaine mise à jour.
+
+## Export d’images
+
+« Exporter l’image » télécharge un SVG vectoriel ou un PNG en résolution 1×, 2× ou 3×, indépendamment du zoom. Choisir un fond blanc, sombre, transparent ou personnalisé ; les couleurs du diagramme sont conservées. Le nom reprend celui du fichier `.mmd` importé. Tout se passe dans le navigateur.
+
+L’export attend un aperçu valide du code courant. Le PNG est limité à 16 384 pixels par côté et 32 millions de pixels ; choisir une résolution inférieure ou le SVG au-delà. Les ressources externes ne sont pas exportées. Les 35 exemples disposent de tests de téléchargement, de conservation des textes et de comparaison SVG/PNG sous Chromium. Firefox et Safari restent à valider.
 
 ## Fichiers et brouillon
 
