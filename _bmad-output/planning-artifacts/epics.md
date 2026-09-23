@@ -28,4 +28,6 @@ Chaque ligne est une story courte ; les critères détaillés restent dans le [P
 
 **Simplification de l’éditeur.** Catalogue ouvert depuis l’en-tête uniquement ; liste déroulante et barre de configuration retirées. Thèmes/couleurs modifiables dans le code. Notifications temporaires de quatre secondes.
 
-**Prochaine étape.** Story 4.1 : automatiser les releases des sources et la publication Docker sur GHCR.
+**Livraison — story 4.1 préparée.** Workflow de tag, CI réutilisable, images multi-architectures vérifiées par digest avant promotion, archives des sources et sommes de contrôle, installation et retour arrière documentés. Validation locale : actionlint/ShellCheck, trois tests de release, 115 tests Chromium par image ARM64/AMD64 et démarrage Compose. Sans remote GitHub, la première publication et la visibilité publique GHCR restent à valider ; la story ne sera terminée qu’après ce passage réel.
+
+**Prochaine étape.** Relier le dépôt à GitHub et valider la release initiale ; compléter Firefox/Safari avant validation finale du MVP. Les comptes et volumes premium restent hors MVP.

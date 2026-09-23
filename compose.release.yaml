@@ -1,0 +1,13 @@
+services:
+  app:
+    image: ${MERMAID6_IMAGE:?Définir MERMAID6_IMAGE avec une image GHCR versionnée ou un digest}
+    ports:
+      - '127.0.0.1:${MERMAID6_PORT:-8080}:8080'
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true

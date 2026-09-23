@@ -43,6 +43,7 @@ Ouvrir [localhost:5173](http://localhost:5173). Aucun compte ni service externe 
 npm run check                  # Formatage, lint, typage et build
 npx playwright install chromium
 npm test                       # Test navigateur sur le build local
+npm run test:release           # Versions, archives et sommes de contrôle
 ```
 
 `npm run check` doit précéder `npm test`, qui sert le dossier `dist`. `npm run format` applique le formatage. Sur Linux, installer aussi les dépendances du navigateur avec `npx playwright install --with-deps chromium`.
@@ -65,13 +66,15 @@ PLAYWRIGHT_BASE_URL=http://127.0.0.1:8080 npm test
 docker compose down
 ```
 
+Pour installer une image publiée sans compiler le projet, utiliser [compose.release.yaml](compose.release.yaml) et suivre le [guide des releases](docs/releases.md).
+
 Le port est exposé sur la boucle locale ; pour un accès distant, configurer une exposition réseau et un reverse proxy HTTPS adaptés. Aucun volume n’est nécessaire au socle ; le stockage premium sur `/data` reste prévu pour plus tard.
 
 ## Intégration continue
 
 Le workflow [CI](.github/workflows/ci.yml) s’exécute sur les pull requests et les pushes vers `main`. Il vérifie le code, construit l’image, attend son état sain, contrôle l’exécution sans root et teste l’application sur des dimensions de bureau et de mobile avec Chromium. Les tests couvrent aussi l’édition, la reprise après erreur, les thèmes, le téléchargement de source, le clavier, la sécurité du rendu, les réponses dépassées, la santé HTTP et les ressources compilées.
 
-Les releases des sources et la publication sur GHCR seront ajoutées dans l’epic 4.
+Le workflow [Release](.github/workflows/release.yml) prépare les archives des sources et publie les images GHCR `linux/amd64` et `linux/arm64` après validation du commit et des images récupérées par digest. Déclenchement par tag `vX.Y.Z` cohérent avec la version du projet ; préversions acceptées sans modifier `latest`. [Publication, installation, mise à jour et retour arrière](docs/releases.md). Le dépôt doit encore être relié à GitHub pour valider la première publication réelle.
 
 ## Cadrage BMAD allégé
 

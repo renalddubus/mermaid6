@@ -24,6 +24,8 @@ Orientations validées dans le cadrage BMAD le 23 septembre 2026. Les choix expl
 - Tag `vX.Y.Z` : après validation, créer une GitHub Release avec archives des sources et sommes de contrôle ; publier l'image correspondante sur GHCR pour `linux/amd64` et `linux/arm64`.
 - Associer tag, commit et image ; réserver `latest` aux versions stables. Le fichier `LICENSE` MIT est fourni depuis l'epic 1.
 
+**Implémentation de la story 4.1.** Une image candidate est publiée dans GHCR, puis récupérée par digest et testée sur des runners natifs AMD64/ARM64. Seul ce digest est promu vers les tags de version ; `latest` est réservé aux publications stables. Archives créées depuis le commit Git, métadonnées de traçabilité et sommes SHA-256 jointes à la release. Voir le [guide de publication](../../docs/releases.md). La publication réelle reste à valider après configuration du remote GitHub.
+
 ## Extension premium
 
 Faire évoluer l'image pour servir aussi une API Node.js. Authentification et autorisations côté serveur ; le mode gratuit reste disponible. SQLite convient comme proposition initiale pour une instance unique.
