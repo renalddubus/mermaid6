@@ -1,0 +1,15 @@
+**
+!package.json
+!package-lock.json
+!.npmrc
+!tsconfig.json
+!vite.config.ts
+!playwright.config.ts
+!index.html
+!LICENSE
+!src
+!src/**
+!public
+!public/**
+!docker
+!docker/**
