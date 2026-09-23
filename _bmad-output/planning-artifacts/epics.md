@@ -22,4 +22,6 @@ Chaque ligne est une story courte ; les critères détaillés restent dans le [P
 
 **Catalogue — story 2.2 réalisée.** 35 exemples classés par usage, recherche, aperçus Mermaid et sélection depuis l’éditeur. Palettes adaptées au type, sources préservées et limites détaillées dans le [catalogue de rendu](../../docs/diagrammes.md). Matrice Chromium : rendu Personnalisé/Sombre, effet visible des couleurs et parcours bureau/mobile. La validation d’export reste dans la story 3.2 ; C4 hors Context et ZenUML ne sont pas annoncés compatibles.
 
-**Prochaine étape.** Story 3.1 : importer un `.mmd` et restaurer le brouillon local après rechargement.
+**Fichiers — story 3.1 réalisée.** Import UTF-8 `.mmd`, téléchargement avec nom et configuration conservés, brouillon IndexedDB restauré après rechargement. Confirmation avant remplacement, état de sauvegarde et repli vers le téléchargement si le stockage échoue. Tests : aller-retour BOM/CRLF, syntaxe invalide, limites, saisie pendant l’import, restauration, stockage bloqué/quota et mobile.
+
+**Prochaine étape.** Story 3.2 : exporter en SVG et PNG, choisir le fond et la résolution, vérifier la fidélité par type.

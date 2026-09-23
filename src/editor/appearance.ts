@@ -61,6 +61,8 @@ export const themes = [
 ];
 
 function frontmatter(source: string) {
+  const prefix = source.startsWith('\uFEFF') ? '\uFEFF' : '';
+  source = source.slice(prefix.length);
   const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
   if (!match && source.startsWith('---'))
     throw new Error(
@@ -78,7 +80,11 @@ function frontmatter(source: string) {
   const variables = document.getIn(['config', 'themeVariables']);
   if (variables !== undefined && !isMap(variables))
     throw new Error('themeVariables doit être un objet YAML.');
-  return { document, body: match ? source.slice(match[0].length) : source };
+  return {
+    document,
+    prefix,
+    body: match ? source.slice(match[0].length) : source,
+  };
 }
 
 export function readAppearance(
@@ -119,7 +125,7 @@ export function changeAppearance(
   value: string,
   fields: ColorField[] = colorFields.nodes,
 ) {
-  const { document, body } = frontmatter(source);
+  const { document, body, prefix } = frontmatter(source);
   if (key === 'theme') {
     document.setIn(['config', 'theme'], value);
     if (value === 'base')
@@ -133,5 +139,5 @@ export function changeAppearance(
     if (key === 'primaryBorderColor')
       document.setIn(['config', 'themeVariables', 'nodeBorder'], value);
   }
-  return `---\n${document.toString()}---\n${body}`;
+  return `${prefix}---\n${document.toString()}---\n${body}`;
 }

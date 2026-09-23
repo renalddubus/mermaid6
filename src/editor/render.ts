@@ -48,7 +48,7 @@ export function renderDiagram(source: string, isCurrent: () => boolean) {
     try {
       const { svg, diagramType } = await mermaid.render(
         `mermaid6-${++counter}`,
-        source,
+        source.replace(/^\uFEFF/, ''),
         container,
       );
       if (!isCurrent()) return null;

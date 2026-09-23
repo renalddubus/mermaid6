@@ -11,7 +11,9 @@ Orientations validées dans le cadrage BMAD le 23 septembre 2026. Les choix expl
 - **Stockage :** un brouillon dans le navigateur via IndexedDB. Séparer édition, rendu, export et accès aux données pour accueillir une bibliothèque serveur plus tard.
 - **Sécurité :** imposer [Mermaid `securityLevel: strict`](https://mermaid.js.org/config/schema-docs/config-properties-securitylevel.html), empêcher sa modification par la source et filtrer les ressources externes. Prévoir des limites de taille et de complexité.
 
-**Implémentation de la story 2.1.** L’accueil et l’éditeur sont deux pages ; l’éditeur et les moteurs de diagrammes sont chargés à la demande. Les rendus sont sérialisés et leurs résultats dépassés ignorés. Le mode strict, les limites et l’interdiction des libellés HTML sont verrouillés ; DOMPurify nettoie le SVG et une CSP limite les ressources au site. Le YAML est modifié structurellement pour conserver commentaires et paramètres existants. Le stockage IndexedDB et les exports image ci-dessus restent planifiés.
+**Implémentation de la story 2.1.** L’accueil et l’éditeur sont deux pages ; l’éditeur et les moteurs de diagrammes sont chargés à la demande. Les rendus sont sérialisés et leurs résultats dépassés ignorés. Le mode strict, les limites et l’interdiction des libellés HTML sont verrouillés ; DOMPurify nettoie le SVG et une CSP limite les ressources au site. Le YAML est modifié structurellement pour conserver commentaires et paramètres existants. Le stockage IndexedDB est réalisé dans la story 3.1 ; les exports image restent planifiés.
+
+**Implémentation de la story 3.1.** IndexedDB `mermaid6`, version 1, store `drafts`, clé `current` : source, nom, origine de l’exemple et date. Chargement avant montage de l’éditeur pour éviter d’écraser le brouillon ; écriture temporisée et état confirmé à la fin de la transaction. Un nouvel exemple ne remplace pas silencieusement le brouillon. Les accès aux fichiers et au stockage sont séparés du rendu ; aucune API serveur n’est nécessaire.
 
 ## Docker et GitHub Actions
 
