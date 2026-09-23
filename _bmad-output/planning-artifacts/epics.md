@@ -18,4 +18,6 @@ Chaque ligne est une story courte ; les critères détaillés restent dans le [P
 
 **Suivi — 23 septembre 2026.** Epic 1 réalisé : stories 1.1 et 1.2 terminées. Page React/TypeScript, licence MIT, contrôles de code, image Docker sans root et workflow CI disponibles. Compilation, santé Docker et trois tests Chromium (bureau, mobile, serveur) vérifiés localement. Le workflow GitHub Actions reste à exécuter après publication du dépôt sur GitHub.
 
-**Prochaine étape.** Epic 2, story 2.1 : éditeur Mermaid avec aperçu, erreurs et zoom.
+**Édition — story 2.1 réalisée.** Éditeur CodeMirror à `/editor`, Mermaid 12, rendu temporisé, erreurs avec dernier aperçu signalé, zoom et bascule mobile. Thèmes et couleurs amorcent la story 2.2. Vérification Chromium sur Docker : édition, clavier, sources invalides, sécurité, personnalisation et téléchargements ; contrôle visuel bureau/mobile. Mesure locale sur macOS arm64, Chromium 153.0.8010.12, moteur déjà chargé : flowchart de 100 nœuds en chaîne rendu en 871 ms, saisie automatisée et temporisation incluses (mesure indicative, sans bridage CPU). Firefox et Safari restent à vérifier pour la validation MVP.
+
+**Prochaine étape.** Story 2.2 : élargir les exemples, établir le catalogue de compatibilité et documenter les limites par type. La validation des exports suivra dans la story 3.2.

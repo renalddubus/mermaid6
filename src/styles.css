@@ -383,6 +383,8 @@ h2 {
 }
 .workspace-actions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 8px;
   align-items: center;
   flex-shrink: 0;

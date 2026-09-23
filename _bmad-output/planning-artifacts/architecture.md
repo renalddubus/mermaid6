@@ -11,6 +11,8 @@ Orientations validées dans le cadrage BMAD le 23 septembre 2026. Les choix expl
 - **Stockage :** un brouillon dans le navigateur via IndexedDB. Séparer édition, rendu, export et accès aux données pour accueillir une bibliothèque serveur plus tard.
 - **Sécurité :** imposer [Mermaid `securityLevel: strict`](https://mermaid.js.org/config/schema-docs/config-properties-securitylevel.html), empêcher sa modification par la source et filtrer les ressources externes. Prévoir des limites de taille et de complexité.
 
+**Implémentation de la story 2.1.** L’accueil et l’éditeur sont deux pages ; l’éditeur et les moteurs de diagrammes sont chargés à la demande. Les rendus sont sérialisés et leurs résultats dépassés ignorés. Le mode strict, les limites et l’interdiction des libellés HTML sont verrouillés ; DOMPurify nettoie le SVG et une CSP limite les ressources au site. Le YAML est modifié structurellement pour conserver commentaires et paramètres existants. Le stockage IndexedDB et les exports image ci-dessus restent planifiés.
+
 ## Docker et GitHub Actions
 
 - Image construite en plusieurs étapes, exécutée sans privilèges root ; exemple Docker Compose et contrôle de santé. Aucun volume nécessaire au MVP.
