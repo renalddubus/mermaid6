@@ -7,7 +7,8 @@ import {
   type ReactNode,
 } from 'react';
 import App from './App';
-import { SettingsButton, usePreferences } from './preferences';
+import StateHeader from './components/StateHeader';
+import { usePreferences } from './preferences';
 
 const CataloguePage = lazy(() => import('./CataloguePage'));
 const EditorPage = lazy(() => import('./editor/EditorEntry'));
@@ -29,7 +30,6 @@ export default function Root() {
   return (
     <RouteErrorBoundary key={route} route={route}>
       <Suspense fallback={<RouteLoading route={route} />}>{content}</Suspense>
-      <SettingsButton />
     </RouteErrorBoundary>
   );
 }
@@ -49,12 +49,7 @@ function RouteLoading({ route }: { route: RouteKind }) {
         : 'loadingHome';
   return (
     <main className="route-state" aria-labelledby="route-state-title">
-      <a className="brand" href="/" aria-label={t('homeLabel')}>
-        <img src="/favicon.svg" width="32" height="32" alt="" />
-        <span>
-          Mermaid<span className="brand-six">6</span>
-        </span>
-      </a>
+      <StateHeader />
       <section className="route-state-card">
         <div className="loading-indicator" aria-hidden="true" />
         <h1 id="route-state-title" role="status">
@@ -95,12 +90,7 @@ function RouteFailure() {
   const { t } = usePreferences();
   return (
     <main className="route-state">
-      <a className="brand" href="/" aria-label={t('homeLabel')}>
-        <img src="/favicon.svg" width="32" height="32" alt="" />
-        <span>
-          Mermaid<span className="brand-six">6</span>
-        </span>
-      </a>
+      <StateHeader />
       <section className="route-state-card" role="alert">
         <h1>{t('loadingFailed')}</h1>
         <div className="route-state-actions">

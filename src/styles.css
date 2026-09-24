@@ -50,12 +50,22 @@ body {
 }
 
 .settings-button {
-  position: fixed;
-  z-index: 15;
-  right: 18px;
-  bottom: 18px;
-  box-shadow: 0 8px 28px #0003;
   background: var(--surface-raised);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.state-header {
+  justify-content: space-between;
+}
+
+.route-state .state-header {
+  padding: 0;
 }
 
 .settings-dialog {
@@ -1054,8 +1064,10 @@ h2 {
 }
 @media (max-width: 600px) {
   .site-header {
-    height: 72px;
-    padding: 0 18px;
+    height: auto;
+    min-height: 72px;
+    padding: 16px 18px;
+    flex-wrap: wrap;
     gap: 18px;
   }
   .brand {
@@ -1063,6 +1075,9 @@ h2 {
     gap: 6px;
   }
   .site-header nav {
+    order: 1;
+    width: 100%;
+    margin-left: 0;
     font-size: 11px;
     gap: 16px;
   }

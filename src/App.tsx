@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 import DiagramPreview from './components/DiagramPreview';
 import Icon from './components/Icon';
 import { getSource, inks, models } from './models';
-import { usePreferences } from './preferences';
+import { SettingsButton, usePreferences } from './preferences';
 
 const examples: {
   title: string;
@@ -110,9 +110,12 @@ export default function App() {
           <a href="/examples">{t('examples')}</a>
           <a href="#about">{t('project')}</a>
         </nav>
-        <a className="button primary header-cta" href="/editor">
-          {t('openEditor')} <Icon name="arrow" />
-        </a>
+        <div className="header-actions">
+          <a className="button primary header-cta" href="/editor">
+            {t('openEditor')} <Icon name="arrow" />
+          </a>
+          <SettingsButton />
+        </div>
       </header>
       <main>
         <section className="hero" aria-labelledby="hero-title">

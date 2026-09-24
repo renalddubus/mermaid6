@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import CatalogueBrowser from './components/CatalogueBrowser';
 import Icon from './components/Icon';
-import { usePreferences } from './preferences';
+import { SettingsButton, usePreferences } from './preferences';
 
 export default function CataloguePage() {
   const { t } = usePreferences();
@@ -17,9 +17,12 @@ export default function CataloguePage() {
             Mermaid<span className="brand-six">6</span>
           </span>
         </a>
-        <a className="button primary" href="/editor">
-          {t('openEditor')} <Icon name="arrow" />
-        </a>
+        <div className="header-actions">
+          <a className="button primary" href="/editor">
+            {t('openEditor')} <Icon name="arrow" />
+          </a>
+          <SettingsButton />
+        </div>
       </header>
       <main className="catalogue-main">
         <div className="catalogue-intro">

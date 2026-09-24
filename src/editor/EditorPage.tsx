@@ -12,7 +12,7 @@ import { importSource } from './importSource';
 import ExportDialog from './ExportDialog';
 import { exportImage, downloadImage, type ImageOptions } from './exportImage';
 import './editor.css';
-import { usePreferences } from '../preferences';
+import { SettingsButton, usePreferences } from '../preferences';
 import type { Values } from '../i18n/copy';
 import DiagramSvg from '../components/DiagramSvg';
 
@@ -272,6 +272,7 @@ export default function EditorPage({
             {t('Download .mmd')}
           </button>
         </div>
+        <SettingsButton />
       </header>
       <main className="editor-main">
         {sourceExample && (

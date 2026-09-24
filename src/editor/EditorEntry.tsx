@@ -5,6 +5,7 @@ import { readDraft, type Draft } from './drafts';
 import EditorPage from './EditorPage';
 import { usePreferences } from '../preferences';
 import { translateText } from '../i18n/copy';
+import StateHeader from '../components/StateHeader';
 
 function requestedDocument(): Draft {
   const params = new URLSearchParams(window.location.search);
@@ -66,34 +67,37 @@ export default function EditorEntry() {
       />
     );
   return (
-    <main className="draft-start">
-      {conflict ? (
-        <section>
-          <h1>{t('A draft is waiting for you')}</h1>
-          <p>
-            {t(
-              '“{name}” is already saved in this browser. Loading this example will replace it.',
-              { name: conflict.name },
-            )}
-          </p>
-          <div className="draft-start-actions">
-            <button
-              className="button primary"
-              onClick={() => {
-                setInitial({ ...conflict, origin: requested.origin });
-                setRestored(true);
-              }}
-            >
-              {t('Resume my draft')}
-            </button>
-            <button className="button" onClick={() => setInitial(requested)}>
-              {t('Replace with example')}
-            </button>
-          </div>
-        </section>
-      ) : (
-        <p role="status">{t('Looking for your draft…')}</p>
-      )}
-    </main>
+    <>
+      <StateHeader />
+      <main className="draft-start">
+        {conflict ? (
+          <section>
+            <h1>{t('A draft is waiting for you')}</h1>
+            <p>
+              {t(
+                '“{name}” is already saved in this browser. Loading this example will replace it.',
+                { name: conflict.name },
+              )}
+            </p>
+            <div className="draft-start-actions">
+              <button
+                className="button primary"
+                onClick={() => {
+                  setInitial({ ...conflict, origin: requested.origin });
+                  setRestored(true);
+                }}
+              >
+                {t('Resume my draft')}
+              </button>
+              <button className="button" onClick={() => setInitial(requested)}>
+                {t('Replace with example')}
+              </button>
+            </div>
+          </section>
+        ) : (
+          <p role="status">{t('Looking for your draft…')}</p>
+        )}
+      </main>
+    </>
   );
 }

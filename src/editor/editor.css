@@ -309,8 +309,12 @@
     gap: 10px;
   }
   .editor-header-actions {
+    order: 1;
     width: 100%;
     justify-content: space-between;
+  }
+  .editor-header > .settings-button {
+    margin-left: auto;
   }
   .editor-main {
     padding: 16px 14px 0;
