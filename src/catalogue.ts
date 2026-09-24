@@ -1,12 +1,12 @@
 import { models } from './models';
 
 export const categories = [
-  'Processus',
-  'Logiciel',
-  'Organisation',
-  'Données',
-  'Analyse',
-  'Grammaires',
+  'Process',
+  'Software',
+  'Organization',
+  'Data',
+  'Analysis',
+  'Grammars',
 ] as const;
 export type Category = (typeof categories)[number];
 export type ColorProfile =
@@ -32,7 +32,7 @@ function example(
   syntax: string,
   source: string,
   colors: ColorProfile = 'code',
-  note = 'Les couleurs spécifiques se règlent dans la configuration Mermaid.',
+  note = 'Set diagram-specific colors in the Mermaid configuration.',
   docs = id,
   experimental = syntax.includes('beta'),
 ): DiagramExample {
@@ -53,457 +53,457 @@ function example(
 export const catalogue: DiagramExample[] = [
   example(
     'flow',
-    'Flux',
-    'Processus',
-    'Décrire un parcours, une décision et ses alternatives.',
+    'Flow',
+    'Process',
+    'Describe a path, a decision, and its alternatives.',
     'flowchart',
     models[0].source,
     'nodes',
-    'Utilisez classDef et style pour distinguer les étapes.',
+    'Use classDef and style to distinguish steps.',
     'flowchart',
     false,
   ),
   example(
     'sequence',
-    'Séquence',
-    'Logiciel',
-    'Montrer qui échange avec qui, et dans quel ordre.',
+    'Sequence',
+    'Software',
+    'Show who communicates with whom, and in what order.',
     'sequenceDiagram',
     models[1].source,
     'actors',
-    'Les couleurs concernent les participants. Les messages et notes ont leurs propres variables.',
+    'These colors apply to participants. Messages and notes have their own variables.',
     'sequenceDiagram',
     false,
   ),
   example(
     'state',
-    'États',
-    'Processus',
-    'Suivre le cycle de vie d’un objet ou d’une tâche.',
+    'States',
+    'Process',
+    'Follow the life cycle of an object or task.',
     'stateDiagram-v2',
     models[2].source,
     'nodes',
-    'classDef permet de colorer les états ; les états de début et fin restent spécifiques.',
+    'Use classDef to color states; start and end states remain specific.',
     'stateDiagram',
     false,
   ),
   example(
     'class',
     'Classes',
-    'Logiciel',
-    'Décrire les objets, leurs propriétés et leurs relations.',
+    'Software',
+    'Describe objects, their properties, and relationships.',
     'classDiagram',
     `classDiagram
-  class Diagramme {
-    +String titre
+  class Diagram {
+    +String title
     +String source
-    +exporter()
+    +export()
   }
-  class Dossier {
-    +String nom
+  class Folder {
+    +String name
   }
-  Dossier "1" o-- "*" Diagramme`,
+  Folder "1" o-- "*" Diagram`,
     'nodes',
-    'Les styles par classe complètent le thème global.',
+    'Class styles complement the global theme.',
     'classDiagram',
   ),
   example(
     'er',
-    'Entités et relations',
-    'Logiciel',
-    'Organiser les données et leurs cardinalités.',
+    'Entities and relationships',
+    'Software',
+    'Organize data and its cardinalities.',
     'erDiagram',
     `erDiagram
-  DOSSIER ||--o{ DIAGRAMME : contient
-  DOSSIER {
+  FOLDER ||--o{ DIAGRAM : contains
+  FOLDER {
     int id PK
-    string nom
+    string name
   }
-  DIAGRAMME {
+  DIAGRAM {
     int id PK
-    string titre
-    int dossier_id FK
+    string title
+    int folder_id FK
   }`,
     'nodes',
-    'Les lignes alternées des attributs utilisent leurs propres couleurs.',
+    'Alternating attribute rows use their own colors.',
     'entityRelationshipDiagram',
   ),
   example(
     'gantt',
     'Gantt',
-    'Organisation',
-    'Planifier des tâches et leurs dépendances dans le temps.',
+    'Organization',
+    'Plan tasks and their dependencies over time.',
     'gantt',
     `gantt
-  title Préparer une version
+  title Prepare a release
   dateFormat YYYY-MM-DD
   axisFormat %d/%m
-  section Conception
-    Cadrage :done, a, 2026-10-01, 3d
+  section Design
+    Scope :done, a, 2026-10-01, 3d
     Prototype :active, b, after a, 4d
-  section Livraison
+  section Delivery
     Tests :c, after b, 3d
-    Publication :milestone, after c, 0d`,
+    Release :milestone, after c, 0d`,
     'code',
-    'Les statuts done, active et crit ont leurs propres couleurs : taskBkgColor, activeTaskBkgColor, critBkgColor.',
+    'The done, active, and crit statuses use taskBkgColor, activeTaskBkgColor, and critBkgColor.',
   ),
   example(
     'journey',
-    'Parcours utilisateur',
-    'Organisation',
-    'Comparer les étapes d’une expérience et leur ressenti.',
+    'User journey',
+    'Organization',
+    'Compare the stages of an experience and how they feel.',
     'journey',
     `journey
-  title Créer un premier diagramme
-  section Découverte
-    Choisir un exemple: 5: Visiteur
-    Comprendre le code: 3: Visiteur
-  section Création
-    Personnaliser: 4: Auteur
-    Partager: 5: Auteur
-  section Retour
-    Améliorer: 4: Auteur`,
+  title Create a first diagram
+  section Discovery
+    Choose an example: 5: Visitor
+    Understand the code: 3: Visitor
+  section Creation
+    Customize: 4: Author
+    Share: 5: Author
+  section Return
+    Improve: 4: Author`,
     'journey',
-    'Les tâches utilisent fillType0, fillType1… ; les acteurs et en-têtes ont une palette distincte.',
+    'Tasks use fillType0, fillType1…; actors and headings have a separate palette.',
     'userJourney',
   ),
   example(
     'git',
-    'Branches Git',
-    'Logiciel',
-    'Expliquer une stratégie de branches et de fusion.',
+    'Git branches',
+    'Software',
+    'Explain a branching and merging strategy.',
     'gitGraph',
     `gitGraph
   commit id: "Initial"
   branch feature
   checkout feature
-  commit id: "Éditeur"
+  commit id: "Editor"
   checkout main
   merge feature
   commit id: "Version"`,
     'code',
-    'Les branches utilisent git0, git1… dans themeVariables.',
+    'Branches use git0, git1… in themeVariables.',
     'gitgraph',
   ),
   example(
     'mindmap',
-    'Carte mentale',
-    'Organisation',
-    'Déployer une idée en thèmes et sous-thèmes.',
+    'Mind map',
+    'Organization',
+    'Expand an idea into topics and subtopics.',
     'mindmap',
     `mindmap
-  root((Mon projet))
-    Concevoir
-      Besoins
-      Maquettes
-    Construire
-      Éditeur
+  root((My project))
+    Design
+      Needs
+      Mockups
+    Build
+      Editor
       Exports
-    Partager
+    Share
       Documentation
-      Communauté`,
+      Community`,
     'branches',
-    'Les branches suivent la palette cScale ; les icônes externes ne sont pas chargées.',
+    'Branches follow the cScale palette; external icons are not loaded.',
   ),
   example(
     'timeline',
-    'Chronologie',
-    'Organisation',
-    'Raconter une évolution en quelques jalons.',
+    'Timeline',
+    'Organization',
+    'Tell a story through a few milestones.',
     'timeline',
     `timeline
-  title Une idée devient un produit
-  section Imaginer
-    Janvier : Besoins : Premiers croquis
-    Février : Prototype
-  section Construire
-    Mars : Éditeur
-    Avril : Première version
-  section Améliorer
-    Mai : Retours utilisateurs`,
+  title An idea becomes a product
+  section Imagine
+    January : Needs : First sketches
+    February : Prototype
+  section Build
+    March : Editor
+    April : First release
+  section Improve
+    May : User feedback`,
     'sections',
-    'Chaque section utilise une couleur cScale de la palette.',
+    'Each section uses a cScale palette color.',
   ),
   example(
     'pie',
-    'Camembert',
-    'Données',
-    'Montrer comment un ensemble se répartit.',
+    'Pie chart',
+    'Data',
+    'Show how a whole is divided.',
     'pie',
     `pie showData
-  title Répartition du temps
-  "Conception" : 25
-  "Développement" : 50
+  title Time allocation
+  "Design" : 25
+  "Development" : 50
   "Tests" : 25`,
     'pie',
-    'Les couleurs ci-dessous correspondent aux trois premières parts.',
+    'The colors below correspond to the first three slices.',
   ),
   example(
     'quadrant',
     'Quadrants',
-    'Analyse',
-    'Positionner des idées selon deux critères.',
+    'Analysis',
+    'Position ideas using two criteria.',
     'quadrantChart',
     `quadrantChart
-  title Choisir les prochaines fonctionnalités
-  x-axis Effort faible --> Effort fort
-  y-axis Impact faible --> Impact fort
-  quadrant-1 Planifier
-  quadrant-2 Prioriser
-  quadrant-3 Plus tard
-  quadrant-4 Repenser
+  title Choose the next features
+  x-axis Low effort --> High effort
+  y-axis Low impact --> High impact
+  quadrant-1 Plan
+  quadrant-2 Prioritize
+  quadrant-3 Later
+  quadrant-4 Rethink
   Exports: [0.3, 0.85]
   Collaboration: [0.85, 0.9]
-  Raccourcis: [0.2, 0.4]`,
+  Shortcuts: [0.2, 0.4]`,
     'code',
-    'Réglez quadrant1Fill à quadrant4Fill et les styles des points dans le code.',
+    'Set quadrant1Fill through quadrant4Fill and point styles in the code.',
     'quadrantChart',
   ),
   example(
     'xy',
-    'Courbes et barres',
-    'Données',
-    'Comparer des valeurs ou suivre une tendance.',
+    'Lines and bars',
+    'Data',
+    'Compare values or follow a trend.',
     'xychart-beta',
     `xychart-beta
-  title "Diagrammes créés"
-  x-axis [Lun, Mar, Mer, Jeu, Ven]
-  y-axis "Nombre" 0 --> 50
+  title "Diagrams created"
+  x-axis [Mon, Tue, Wed, Thu, Fri]
+  y-axis "Count" 0 --> 50
   bar [12, 25, 18, 40, 32]
   line [10, 20, 25, 30, 35]`,
     'code',
-    'La palette se règle avec themeVariables.xychart.plotColorPalette.',
+    'Set the palette with themeVariables.xychart.plotColorPalette.',
     'xyChart',
   ),
   example(
     'sankey',
     'Sankey',
-    'Données',
-    'Visualiser des quantités qui circulent entre plusieurs postes.',
+    'Data',
+    'Visualize quantities flowing between different areas.',
     'sankey-beta',
     `sankey-beta
-Budget,Produit,60
+Budget,Product,60
 Budget,Support,40
-Produit,Atelier,35
-Produit,Exports,25
+Product,Workshop,35
+Product,Exports,25
 Support,Documentation,40`,
     'code',
-    'Utilisez des libellés ASCII : ce parseur refuse certains accents. La configuration sankey contrôle la coloration des liens.',
+    'Use ASCII labels: this parser rejects some accents. The sankey configuration controls link colors.',
     'sankey',
   ),
   example(
     'block',
-    'Blocs',
-    'Logiciel',
-    'Disposer explicitement les composants d’un système.',
+    'Blocks',
+    'Software',
+    'Explicitly arrange system components.',
     'block-beta',
     `block-beta
   columns 3
-  a["Interface"] b["Rendu"] c["Fichier"]
+  a["Interface"] b["Rendering"] c["File"]
   a --> b
   b --> c`,
     'nodes',
-    'Les instructions style et classDef permettent de colorer chaque bloc.',
+    'Use style and classDef to color individual blocks.',
     'block',
   ),
   example(
     'requirement',
-    'Exigences',
-    'Logiciel',
-    'Relier une exigence à l’élément qui la satisfait.',
+    'Requirements',
+    'Software',
+    'Connect a requirement to the element that satisfies it.',
     'requirementDiagram',
     `requirementDiagram
   requirement local {
     id: R1
-    text: Rendu dans le navigateur
+    text: Render in the browser
     risk: low
     verifymethod: test
   }
-  element editeur {
+  element editor {
     type: application
   }
-  editeur - satisfies -> local`,
+  editor - satisfies -> local`,
     'nodes',
-    'Les exigences et les éléments peuvent recevoir leurs propres styles.',
+    'Requirements and elements can have their own styles.',
     'requirementDiagram',
   ),
   example(
     'kanban',
     'Kanban',
-    'Organisation',
-    'Répartir le travail entre les étapes d’un tableau.',
+    'Organization',
+    'Distribute work across the stages of a board.',
     'kanban',
     `kanban
-  todo[À faire]
-    import[Importer un fichier]
-    export[Exporter une image]
-  doing[En cours]
+  todo[To do]
+    import[Import a file]
+    export[Export an image]
+  doing[In progress]
     catalogue[Catalogue]
-  done[Terminé]
-    editor[Éditeur]`,
+  done[Done]
+    editor[Editor]`,
     'code',
-    'Le thème colore les colonnes. Les liens vers un outil de suivi restent désactivés.',
+    'The theme colors the columns. Links to issue trackers are disabled.',
     'kanban',
     true,
   ),
   example(
     'packet',
-    'Paquets réseau',
-    'Logiciel',
-    'Décrire la position et la taille de champs binaires.',
+    'Network packets',
+    'Software',
+    'Describe the position and size of binary fields.',
     'packet-beta',
     `packet-beta
   0-7: "Version"
   8-15: "Type"
-  16-31: "Longueur"
-  32-63: "Données"`,
+  16-31: "Length"
+  32-63: "Data"`,
     'code',
-    'Les champs se configurent avec packetBlockFill, packetBlockStroke et packetLabelColor.',
+    'Configure fields with packetBlockFill, packetBlockStroke, and packetLabelColor.',
     'packet',
   ),
   example(
     'architecture',
     'Architecture',
-    'Logiciel',
-    'Relier des services, des bases de données et des groupes.',
+    'Software',
+    'Connect services, databases, and groups.',
     'architecture-beta',
     `architecture-beta
   group app(cloud)[Application]
   service api(server)[API] in app
-  service db(database)[Base] in app
-  service disk(disk)[Fichiers] in app
+  service db(database)[Database] in app
+  service disk(disk)[Files] in app
   api:R -- L:db
   api:B -- T:disk`,
     'code',
-    'Seules les icônes intégrées sont disponibles ; aucun pack externe n’est chargé.',
+    'Only built-in icons are available; no external packs are loaded.',
     'architecture',
   ),
   example(
     'c4',
-    'C4 — contexte',
-    'Logiciel',
-    'Situer un système au milieu de ses utilisateurs.',
+    'C4 — context',
+    'Software',
+    'Place a system in the context of its users.',
     'C4Context',
     `C4Context
-  title Contexte de Mermaid6
-  Person(author, "Auteur", "Crée des diagrammes")
-  System(editor, "Mermaid6", "Édition dans le navigateur")
-  Rel(author, editor, "Utilise")`,
+  title Mermaid6 context
+  Person(author, "Author", "Creates diagrams")
+  System(editor, "Mermaid6", "Editing in the browser")
+  Rel(author, editor, "Uses")`,
     'code',
-    'C4 est expérimental. Utilisez UpdateElementStyle ; les variantes Container, Component, Dynamic et Deployment restent à valider.',
+    'C4 is experimental. Use UpdateElementStyle; Container, Component, Dynamic, and Deployment variants are not yet validated.',
     'c4',
     true,
   ),
   example(
     'radar',
     'Radar',
-    'Données',
-    'Comparer plusieurs profils sur les mêmes axes.',
+    'Data',
+    'Compare profiles along the same axes.',
     'radar-beta',
     `radar-beta
-  axis vitesse["Vitesse"], clarte["Clarté"], confort["Confort"]
-  curve actuel["Actuel"]{7, 8, 6}
-  curve cible["Cible"]{9, 9, 9}
+  axis speed["Speed"], clarity["Clarity"], comfort["Comfort"]
+  curve current["Current"]{7, 8, 6}
+  curve target["Target"]{9, 9, 9}
   min 0
   max 10`,
     'code',
-    'Les courbes utilisent radarCurveColors dans themeVariables.',
+    'Curves use radarCurveColors in themeVariables.',
     'radar',
   ),
   example(
     'treemap',
-    'Carte proportionnelle',
-    'Données',
-    'Comparer les tailles de catégories imbriquées.',
+    'Treemap',
+    'Data',
+    'Compare the sizes of nested categories.',
     'treemap-beta',
     `treemap-beta
 "Application"
-  "Éditeur": 50
+  "Editor": 50
   "Catalogue": 30
 "Documentation"
   "Guides": 15
-  "Exemples": 5`,
+  "Examples": 5`,
     'code',
-    'Les styles des sections et des feuilles se règlent dans le code.',
+    'Set section and leaf styles in the code.',
     'treemap',
   ),
   example(
     'venn',
     'Venn',
-    'Analyse',
-    'Montrer ce que plusieurs ensembles ont en commun.',
+    'Analysis',
+    'Show what sets have in common.',
     'venn-beta',
     `venn-beta
-  title Trouver la bonne idée
-  set Utile
-  set Faisable
-  union Utile,Faisable["À construire"]`,
+  title Find the right idea
+  set Useful
+  set Feasible
+  union Useful,Feasible["To build"]`,
     'code',
-    'Les ensembles et intersections ont leurs propres instructions de style.',
+    'Sets and intersections have their own style instructions.',
     'venn',
   ),
   example(
     'ishikawa',
-    'Causes et effets',
-    'Analyse',
-    'Explorer les causes possibles d’un problème.',
+    'Cause and effect',
+    'Analysis',
+    'Explore possible causes of a problem.',
     'ishikawa-beta',
     `ishikawa-beta
-  Livraison en retard
-  Organisation
-    Objectif imprécis
-    Trop de priorités
-  Technique
-    Tests tardifs
-    Dépendances bloquées`,
+  Late delivery
+  Organization
+    Unclear goal
+    Too many priorities
+  Technical
+    Late tests
+    Blocked dependencies`,
     'code',
-    'La palette des branches est spécifique au diagramme Ishikawa.',
+    'The branch palette is specific to the Ishikawa diagram.',
     'ishikawa',
   ),
   example(
     'wardley',
-    'Carte de Wardley',
-    'Analyse',
-    'Positionner une chaîne de valeur selon son évolution.',
+    'Wardley map',
+    'Analysis',
+    'Position a value chain along its evolution.',
     'wardley-beta',
     `wardley-beta
-  title Partager une idée
-  anchor Auteur [0.95, 0.4]
-  component Diagramme [0.75, 0.5]
-  component Editeur [0.5, 0.65]
-  component Navigateur [0.2, 0.9]
-  Auteur -> Diagramme
-  Diagramme -> Editeur
-  Editeur -> Navigateur`,
+  title Share an idea
+  anchor Author [0.95, 0.4]
+  component Diagram [0.75, 0.5]
+  component Editor [0.5, 0.65]
+  component Browser [0.2, 0.9]
+  Author -> Diagram
+  Diagram -> Editor
+  Editor -> Browser`,
     'code',
-    'Les coordonnées représentent visibilité et évolution ; le thème règle les couleurs générales.',
+    'Coordinates represent visibility and evolution; the theme sets general colors.',
     'wardley',
   ),
   example(
     'cynefin',
     'Cynefin',
-    'Analyse',
-    'Adapter la décision à la nature d’une situation.',
+    'Analysis',
+    'Adapt decisions to the nature of a situation.',
     'cynefin-beta',
     `cynefin-beta
-  title Décider comment agir
+  title Decide how to act
   clear
-    "Appliquer une procédure"
+    "Follow a procedure"
   complicated
-    "Demander une expertise"
+    "Seek expertise"
   complex
-    "Tester une hypothèse"
+    "Test a hypothesis"
   chaotic
-    "Stabiliser le service"`,
+    "Stabilize the service"`,
     'code',
-    'Chaque domaine possède ses couleurs dédiées dans le thème.',
+    'Each domain has dedicated theme colors.',
     'cynefin',
   ),
   example(
     'tree',
-    'Arborescence',
-    'Logiciel',
-    'Présenter la structure d’un projet ou d’un dossier.',
+    'Directory tree',
+    'Software',
+    'Present the structure of a project or folder.',
     'treeView-beta',
     `treeView-beta
 ├── src/
@@ -512,129 +512,129 @@ Support,Documentation,40`,
 ├── tests/
 └── README.md`,
     'code',
-    'L’indentation et les caractères de branche définissent l’arbre.',
+    'Indentation and branch characters define the tree.',
     'treeView',
   ),
   example(
     'swimlane',
-    'Couloirs',
-    'Processus',
-    'Répartir les étapes d’un processus entre les responsables.',
+    'Swimlanes',
+    'Process',
+    'Assign process steps to their owners.',
     'swimlane-beta',
     `swimlane-beta LR
-  subgraph Auteur
-    A[Créer]
-    B[Relire]
+  subgraph Author
+    A[Create]
+    B[Review]
   end
-  subgraph Lecteur
-    C[Découvrir]
+  subgraph Reader
+    C[Discover]
   end
   A --> B --> C`,
     'nodes',
-    'Chaque subgraph devient un couloir ; les styles Mermaid distinguent les étapes.',
+    'Each subgraph becomes a lane; Mermaid styles distinguish the steps.',
     'swimlanes',
   ),
   example(
     'usecase',
-    'Cas d’utilisation',
-    'Logiciel',
-    'Décrire les actions offertes aux utilisateurs.',
+    'Use cases',
+    'Software',
+    'Describe the actions available to users.',
     'usecase-beta',
     `usecase-beta
   direction LR
-  actor Auteur("Auteur")
+  actor Author("Author")
   systemBoundary Application[Mermaid6]
-    Creer("Créer un diagramme")
-    Exporter("Télécharger la source")
+    Create("Create a diagram")
+    Export("Download the source")
   end
-  Auteur --> Creer
-  Auteur --> Exporter`,
+  Author --> Create
+  Author --> Export`,
     'nodes',
-    'Les frontières ne peuvent pas être imbriquées ; les acteurs utilisent des formes intégrées.',
+    'Boundaries cannot be nested; actors use built-in shapes.',
     'usecase',
   ),
   example(
     'event',
-    'Événements',
-    'Processus',
-    'Raconter les étapes d’une interaction avec un système.',
+    'Events',
+    'Process',
+    'Describe the steps of an interaction with a system.',
     'eventmodeling',
     `eventmodeling
-  tf 01 ui Editeur
-  tf 02 cmd CreerDiagramme
-  tf 03 evt DiagrammeCree`,
+  tf 01 ui Editor
+  tf 02 cmd CreateDiagram
+  tf 03 evt DiagramCreated`,
     'code',
-    'Les écrans, commandes et événements ont des couleurs sémantiques distinctes.',
+    'Screens, commands, and events use distinct semantic colors.',
     'eventmodeling',
     true,
   ),
   example(
     'agent',
     'Agents',
-    'Processus',
-    'Décrire les étapes et outils d’un agent.',
+    'Process',
+    'Describe the steps and tools of an agent.',
     'agentflow-beta',
     `agentflow-beta TB
   flow assistant["Assistant"]
-    demande["Demande"]@{ shape: input }
-    traiter["Analyser"]@{ shape: task }
-    outil["Vérifier"]@{ shape: tool }
-    demande --> traiter --> outil
+    request["Request"]@{ shape: input }
+    process["Analyze"]@{ shape: task }
+    tool["Check"]@{ shape: tool }
+    request --> process --> tool
   end`,
     'nodes',
-    'Les formes indiquent entrées, tâches et outils ; les styles restent dans le code.',
+    'Shapes indicate inputs, tasks, and tools; styles stay in the code.',
     'agentflow',
   ),
   example(
     'railroad',
-    'Grammaire visuelle',
-    'Grammaires',
-    'Décrire une règle avec des choix et des répétitions.',
+    'Visual grammar',
+    'Grammars',
+    'Describe a rule with choices and repetitions.',
     'railroad-beta',
     `railroad-beta
-  title Une réponse
-  reponse = choice(terminal("oui"), terminal("non")) ;`,
+  title An answer
+  answer = choice(terminal("yes"), terminal("no")) ;`,
     'code',
-    'La couleur dépend du type de symbole : terminal, référence et liaison.',
+    'Colors depend on the symbol type: terminal, reference, or connection.',
     'railroad',
   ),
   example(
     'ebnf',
-    'Grammaire EBNF',
-    'Grammaires',
-    'Visualiser une grammaire écrite en EBNF.',
+    'EBNF grammar',
+    'Grammars',
+    'Visualize a grammar written in EBNF.',
     'railroad-ebnf-beta',
     `railroad-ebnf-beta
-  title Une réponse
-  reponse = "oui" | "non" ;`,
+  title An answer
+  answer = "yes" | "no" ;`,
     'code',
-    'Les diagrammes représentent la grammaire ; ils ne valident pas un texte utilisateur.',
+    'Diagrams represent the grammar; they do not validate user text.',
     'railroad',
   ),
   example(
     'abnf',
-    'Grammaire ABNF',
-    'Grammaires',
-    'Visualiser des règles de protocole au format ABNF.',
+    'ABNF grammar',
+    'Grammars',
+    'Visualize protocol rules in ABNF format.',
     'railroad-abnf-beta',
     `railroad-abnf-beta
-  title Une réponse
-  reponse = "oui" / "non" ;`,
+  title An answer
+  answer = "yes" / "no" ;`,
     'code',
-    'ABNF utilise / pour les alternatives. Les couleurs des symboles sont spécifiques.',
+    'ABNF uses / for alternatives. Symbols have specific colors.',
     'railroad',
   ),
   example(
     'peg',
-    'Grammaire PEG',
-    'Grammaires',
-    'Visualiser des choix ordonnés au format PEG.',
+    'PEG grammar',
+    'Grammars',
+    'Visualize ordered choices in PEG format.',
     'railroad-peg-beta',
     `railroad-peg-beta
-  title Une réponse
-  reponse <- "oui" / "non" ;`,
+  title An answer
+  answer <- "yes" / "no" ;`,
     'code',
-    'Les choix PEG sont ordonnés ; la palette dépend du type de symbole.',
+    'PEG choices are ordered; the palette depends on the symbol type.',
     'railroad',
   ),
 ];

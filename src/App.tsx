@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import DiagramPreview from './components/DiagramPreview';
 import Icon from './components/Icon';
@@ -11,24 +11,27 @@ const examples: {
   description: string;
 }[] = [
   {
-    title: 'De l’idée au partage',
-    category: 'Flux',
-    description: 'Une idée prend forme, pas à pas.',
+    title: 'From idea to sharing',
+    category: 'Flow',
+    description: 'An idea takes shape, step by step.',
   },
   {
-    title: 'Une conversation',
-    category: 'Séquence',
-    description: 'Des échanges qui font avancer les idées.',
+    title: 'A conversation',
+    category: 'Sequence',
+    description: 'Exchanges that move ideas forward.',
   },
   {
-    title: 'Cycle de vie',
-    category: 'États',
-    description: 'Chaque étape ouvre de nouvelles possibilités.',
+    title: 'Life cycle',
+    category: 'States',
+    description: 'Every stage opens up new possibilities.',
   },
 ];
 
 export default function App() {
-  const { t } = usePreferences();
+  const { t, tx } = usePreferences();
+  useEffect(() => {
+    document.title = `Mermaid6 — ${t('Workshop')}`;
+  }, [t]);
   const [selected, setSelected] = useState(0);
   const [inkIndex, setInkIndex] = useState(0);
   const [sourceOpen, setSourceOpen] = useState(false);
@@ -53,9 +56,9 @@ export default function App() {
   const visibleExamples = examples
     .map((item, index) => ({ ...item, index }))
     .filter((item) =>
-      normalize(`${item.title} ${item.category} ${item.description}`).includes(
-        normalize(query),
-      ),
+      normalize(
+        `${tx(item.title)} ${tx(item.category)} ${tx(item.description)} ${models[item.index].syntax}`,
+      ).includes(normalize(query)),
     );
 
   function selectModel(index: number) {
@@ -70,9 +73,9 @@ export default function App() {
   async function copySource() {
     try {
       await navigator.clipboard.writeText(source);
-      setNotice('Source copiée.');
+      setNotice('Source copied.');
     } catch {
-      setNotice('Copie indisponible. Téléchargez le fichier .mmd.');
+      setNotice('Copy unavailable. Download the .mmd file.');
     }
   }
   function downloadSource() {
@@ -84,7 +87,7 @@ export default function App() {
     link.download = `mermaid6-${model.id}.mmd`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setNotice('Fichier .mmd téléchargé.');
+    setNotice('.mmd file downloaded.');
   }
   function closeSource() {
     setSourceOpen(false);
@@ -130,7 +133,7 @@ export default function App() {
           </div>
           <div className="hero-details">
             <span>{t('noAccount')}</span>
-            <span>Open source · MIT</span>
+            <span>{t('Open source · MIT')}</span>
             <span>{t('inBrowser')}</span>
           </div>
         </section>
@@ -141,18 +144,20 @@ export default function App() {
         >
           <div className="discovery-heading">
             <div>
-              <span className="section-eyebrow">UNE IDÉE DU POSSIBLE</span>
-              <h2 id="discovery-title">À chaque idée, son diagramme.</h2>
+              <span className="section-eyebrow">
+                {t('A GLIMPSE OF THE POSSIBLE')}
+              </span>
+              <h2 id="discovery-title">{t('Every idea has its diagram.')}</h2>
               <p>
-                Explorez un exemple. Découvrez ce que vos idées peuvent devenir.
+                {t('Explore an example. Discover what your ideas can become.')}
               </p>
             </div>
             <label className="search">
               <Icon name="search" />
               <input
                 type="search"
-                placeholder="Rechercher un exemple…"
-                aria-label="Rechercher un exemple"
+                placeholder={t('Search examples…')}
+                aria-label={t('Search examples')}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
@@ -172,17 +177,19 @@ export default function App() {
                 >
                   <DiagramPreview kind={models[item.index].id} />
                 </div>
-                <span className="example-title">{item.title}</span>
-                <span className="example-description">{item.description}</span>
-                <span className="example-category">{item.category}</span>
+                <span className="example-title">{tx(item.title)}</span>
+                <span className="example-description">
+                  {tx(item.description)}
+                </span>
+                <span className="example-category">{tx(item.category)}</span>
               </button>
             ))}
           </div>
           {visibleExamples.length === 0 && (
             <div className="empty-state" role="status">
-              Aucun exemple pour « {query} ».
+              {t('No examples for “{query}”.', { query })}
               <button className="text-button" onClick={() => setQuery('')}>
-                Effacer la recherche
+                {t('Clear search')}
               </button>
             </div>
           )}
@@ -197,15 +204,16 @@ export default function App() {
         >
           <header className="workspace-header">
             <div>
-              <h2 id="workspace-title">{example.title}</h2>
-              <p>{model.description}</p>
+              <h2 id="workspace-title">{tx(example.title)}</h2>
+              <p>{tx(model.description)}</p>
             </div>
             <div className="workspace-actions">
               <a
                 className="button primary"
                 href={`/editor?example=${model.id}&ink=${inkIndex}`}
               >
-                Modifier cet exemple <Icon name="arrow" />
+                {t('Edit this example')}
+                <Icon name="arrow" />
               </a>
               <button
                 ref={sourceButton}
@@ -215,7 +223,7 @@ export default function App() {
                 aria-controls="source-panel"
               >
                 <Icon name="code" />
-                Source
+                {t('Source')}
               </button>
               <div className="color-control">
                 <button
@@ -225,26 +233,26 @@ export default function App() {
                   aria-controls="color-panel"
                 >
                   <Icon name="palette" />
-                  Couleurs
+                  {t('Colors')}
                 </button>
                 {colorsOpen && (
                   <div
                     id="color-panel"
                     className="color-panel"
                     role="group"
-                    aria-label="Couleur du diagramme"
+                    aria-label={t('Diagram color')}
                     onKeyDown={(event) => {
                       if (event.key === 'Escape') setColorsOpen(false);
                     }}
                   >
-                    <span>Couleur du diagramme</span>
+                    <span>{t('Diagram color')}</span>
                     <div>
                       {inks.map((color, index) => (
                         <button
                           key={color.name}
                           className="swatch"
                           style={{ '--swatch': color.color } as CSSProperties}
-                          aria-label={color.name}
+                          aria-label={tx(color.name)}
                           aria-pressed={inkIndex === index}
                           onClick={() => {
                             setInkIndex(index);
@@ -261,10 +269,11 @@ export default function App() {
               <button
                 className="button primary"
                 onClick={downloadSource}
-                aria-label="Exporter le fichier .mmd"
+                aria-label={t('Export the .mmd file')}
               >
                 <Icon name="export" />
-                Exporter <span className="file-extension">.mmd</span>
+                {t('Export')}
+                <span className="file-extension">.mmd</span>
               </button>
             </div>
           </header>
@@ -273,31 +282,31 @@ export default function App() {
               <aside
                 id="source-panel"
                 className="source-panel"
-                aria-label="Source Mermaid"
+                aria-label={t('Mermaid source')}
                 onKeyDown={(event) => {
                   if (event.key === 'Escape') closeSource();
                 }}
               >
                 <div className="source-heading">
-                  <span>Source Mermaid</span>
+                  <span>{t('Mermaid source')}</span>
                   <div>
                     <button
                       className="icon-button"
-                      aria-label="Copier la source"
+                      aria-label={t('Copy source')}
                       onClick={() => void copySource()}
                     >
                       <Icon name="copy" />
                     </button>
                     <button
                       className="icon-button"
-                      aria-label="Fermer la source"
+                      aria-label={t('Close source')}
                       onClick={closeSource}
                     >
                       <Icon name="close" />
                     </button>
                   </div>
                 </div>
-                <pre tabIndex={0} aria-label="Code source du modèle">
+                <pre tabIndex={0} aria-label={t('Example source code')}>
                   <code>
                     {source.split('\n').map((line, index) => (
                       <span
@@ -313,20 +322,20 @@ export default function App() {
                   </code>
                 </pre>
                 <div className="source-caption">
-                  {model.id}.mmd<span>Lecture seule</span>
+                  {model.id}.mmd<span>{t('Read only')}</span>
                 </div>
               </aside>
             )}
             <div className="preview">
               <div className="preview-heading">
-                <span>Aperçu</span>
-                <span className="preview-kind">{example.category}</span>
+                <span>{t('Preview')}</span>
+                <span className="preview-kind">{tx(example.category)}</span>
               </div>
               <div
                 className="art-window"
                 tabIndex={0}
                 role="region"
-                aria-label="Diagramme, zone défilante après agrandissement"
+                aria-label={t('Diagram, scroll after zooming')}
               >
                 <div
                   className="art-transform"
@@ -336,14 +345,14 @@ export default function App() {
                 </div>
               </div>
               <div className="preview-footer">
-                <span>Aperçu illustré</span>
+                <span>{t('Illustrated preview')}</span>
                 <div
                   className="zoom-tools"
                   role="group"
-                  aria-label="Zoom du diagramme"
+                  aria-label={t('Diagram zoom')}
                 >
                   <button
-                    aria-label="Réduire"
+                    aria-label={t('Zoom out')}
                     disabled={zoom <= 60}
                     onClick={() => setZoom(zoom - 20)}
                   >
@@ -351,13 +360,13 @@ export default function App() {
                   </button>
                   <button
                     className="zoom-reset"
-                    aria-label="Réinitialiser le zoom"
+                    aria-label={t('Reset zoom')}
                     onClick={() => setZoom(100)}
                   >
                     {zoom}%
                   </button>
                   <button
-                    aria-label="Agrandir"
+                    aria-label={t('Zoom in')}
                     disabled={zoom >= 300}
                     onClick={() => setZoom(zoom + 20)}
                   >
@@ -371,33 +380,36 @@ export default function App() {
         <div className="tip">
           <Icon name="info" />
           <p>
-            <strong>À explorer</strong> Passez d’un exemple à l’autre, changez
-            ses couleurs et emportez sa source Mermaid.
-            <span> Ouvrez l’éditeur pour modifier cet exemple en direct.</span>
+            <strong>{t('Try it out')}</strong>{' '}
+            {t(
+              'Switch examples, change their colors, and take their Mermaid source with you.',
+            )}
+            <span> {t('Open the editor to modify this example live.')}</span>
           </p>
         </div>
         <section className="about" id="about" aria-labelledby="about-title">
           <div>
-            <span className="section-eyebrow">LIBRE DE CRÉER</span>
+            <span className="section-eyebrow">{t('FREE TO CREATE')}</span>
             <h2 id="about-title">
-              Vos idées.
+              {t('Your ideas.')}
               <br />
-              Votre espace.
+              {t('Your space.')}
             </h2>
           </div>
           <div className="about-copy">
             <p>
-              Mermaid6 est un projet open source conçu pour rendre les
-              diagrammes plus accessibles. Explorez un exemple, observez sa
-              construction et emportez sa source pour l’adapter.
+              {t(
+                'Mermaid6 is an open-source project that makes diagrams more accessible. Explore an example, see how it works, and take its source to adapt it.',
+              )}
             </p>
             <p>
-              Le projet est distribué sous licence MIT et peut être hébergé chez
-              vous avec Docker. Une façon simple de garder la main sur votre
-              outil.
+              {t(
+                'The project uses the MIT license and can be self-hosted with Docker, so you stay in control of your tool.',
+              )}
             </p>
             <button className="text-button" onClick={showAll}>
-              Trouver mon point de départ <Icon name="arrow" />
+              {t('Find my starting point')}
+              <Icon name="arrow" />
             </button>
           </div>
         </section>
@@ -406,17 +418,18 @@ export default function App() {
         <span className="footer-brand">
           Mermaid<span>6</span>
         </span>
-        <span>Des idées en diagrammes. Un projet ouvert.</span>
+        <span>{t('Ideas into diagrams. An open project.')}</span>
         <a href="#examples">
-          Explorer <Icon name="arrow" />
+          {t('Explore')}
+          <Icon name="arrow" />
         </a>
       </footer>
       <div className="announcement" role="status">
         {notice && (
           <>
-            <span>{notice}</span>
+            <span>{tx(notice)}</span>
             <button
-              aria-label="Fermer la notification"
+              aria-label={t('Close notification')}
               onClick={() => setNotice('')}
             >
               <Icon name="close" />

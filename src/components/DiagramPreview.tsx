@@ -1,7 +1,9 @@
 import { useId } from 'react';
 import type { DiagramKind } from '../models';
+import { usePreferences } from '../preferences';
 
 export default function DiagramPreview({ kind }: { kind: DiagramKind }) {
+  const { t } = usePreferences();
   const markerId = useId();
   return (
     <svg
@@ -14,7 +16,7 @@ export default function DiagramPreview({ kind }: { kind: DiagramKind }) {
             : '45 180 830 255'
       }
       role="img"
-      aria-label="Aperçu illustré du modèle sélectionné"
+      aria-label={t('Illustrated preview of the selected example')}
     >
       <defs>
         <marker
@@ -104,44 +106,44 @@ export default function DiagramPreview({ kind }: { kind: DiagramKind }) {
           />
           <g className="node-labels">
             <text x="120" y="222">
-              Une idée
+              {t('An idea')}
             </text>
             <text x="325" y="222">
-              La mettre à plat
+              {t('Lay it out')}
             </text>
             <text x="542" y="215">
-              <tspan x="542">Ça tient</tspan>
+              <tspan x="542">{t('Does it')}</tspan>
               <tspan x="542" dy="19">
-                debout ?
+                {t('make sense?')}
               </tspan>
             </text>
             <text x="765" y="222">
-              Donner forme
+              {t('Give it shape')}
             </text>
             <text className="label-inverse" x="765" y="374">
-              Partager
+              {t('Share')}
             </text>
             <text x="340" y="374">
-              Prendre du recul
+              {t('Step back')}
             </text>
           </g>
           <g className="edge-labels">
             <text x="646" y="204">
-              oui
+              {t('yes')}
             </text>
             <text x="560" y="334">
-              pas encore
+              {t('not yet')}
             </text>
           </g>
           <g className="diagram-note">
             <path d="M324 119Q341 101 392 115" />
             <text x="267" y="93" transform="rotate(-5 267 93)">
-              commencer quelque part
+              {t('start somewhere')}
             </text>
             <path d="M349 128L326 119L333 105" />
           </g>
           <text className="diagram-footnote" x="207" y="437">
-            les détours font aussi partie du chemin.
+            {t('detours are part of the journey, too.')}
           </text>
         </>
       )}
@@ -161,13 +163,13 @@ export default function DiagramPreview({ kind }: { kind: DiagramKind }) {
           <rect className="node-paper" x="675" y="64" width="130" height="50" />
           <g className="node-labels">
             <text x="160" y="92">
-              Vous
+              {t('You')}
             </text>
             <text x="450" y="92">
-              Une idée
+              {t('An idea')}
             </text>
             <text x="740" y="92">
-              Le monde
+              {t('The world')}
             </text>
           </g>
           <g className="connectors" markerEnd={`url(#${markerId}-arrow)`}>
@@ -181,19 +183,19 @@ export default function DiagramPreview({ kind }: { kind: DiagramKind }) {
           </g>
           <g className="sequence-labels">
             <text x="305" y="168">
-              Et si on essayait ?
+              {t('What if we tried?')}
             </text>
             <text x="305" y="229">
-              Pourquoi pas.
+              {t('Why not.')}
             </text>
             <text x="305" y="290">
-              Une première version
+              {t('A first version')}
             </text>
             <text x="595" y="351">
-              À vous de jouer
+              {t('Your turn')}
             </text>
             <text x="450" y="412">
-              Et si on allait plus loin ?
+              {t('What if we went further?')}
             </text>
           </g>
         </>
@@ -249,30 +251,30 @@ export default function DiagramPreview({ kind }: { kind: DiagramKind }) {
           <circle className="state-point" cx="848" cy="233" r="7" />
           <g className="node-labels">
             <text x="215" y="235">
-              Brouillon
+              {t('Draft')}
             </text>
             <text x="465" y="235">
-              En cours
+              {t('In progress')}
             </text>
             <text x="465" y="394">
-              En pause
+              {t('Paused')}
             </text>
             <text className="label-inverse" x="720" y="235">
-              C’est prêt
+              {t('Ready')}
             </text>
           </g>
           <g className="edge-labels">
             <text x="306" y="217">
-              se lancer
+              {t('get started')}
             </text>
             <text x="558" y="217">
-              peaufiner
+              {t('refine')}
             </text>
             <text x="491" y="318">
-              souffler
+              {t('take a breath')}
             </text>
             <text x="283" y="334">
-              reprendre
+              {t('resume')}
             </text>
           </g>
           <text
@@ -281,7 +283,7 @@ export default function DiagramPreview({ kind }: { kind: DiagramKind }) {
             y="133"
             transform="rotate(-4 309 133)"
           >
-            rien ne presse. mais tout avance.
+            {t('no rush. everything moves forward.')}
           </text>
         </>
       )}

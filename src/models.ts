@@ -1,7 +1,7 @@
 export const inks = [
-  { name: 'Corail', color: '#d93655', wash: '#ffe7ed' },
-  { name: 'Outremer', color: '#3158bc', wash: '#dde5f7' },
-  { name: 'Pin', color: '#28715b', wash: '#dce9df' },
+  { name: 'Coral', color: '#d93655', wash: '#ffe7ed' },
+  { name: 'Ultramarine', color: '#3158bc', wash: '#dde5f7' },
+  { name: 'Pine', color: '#28715b', wash: '#dce9df' },
   { name: 'Graphite', color: '#393936', wash: '#e1e0da' },
 ] as const;
 
@@ -17,52 +17,50 @@ export const models: {
 }[] = [
   {
     id: 'flow',
-    label: 'Faire son chemin',
-    title: 'Rien n’est tout à fait linéaire.',
-    description:
-      'Une idée, quelques détours, et quelque chose qui prend forme.',
+    label: 'Find your way',
+    title: 'Nothing is quite linear.',
+    description: 'An idea, a few detours, and something taking shape.',
     syntax: 'flowchart',
     source: `flowchart LR
-  A([Une idée]) --> B[La mettre à plat]
-  B --> C{Ça tient debout ?}
-  C -->|Oui| D[Donner forme]
-  D --> E([Partager])
-  C -->|Pas encore| F[Prendre du recul]
+  A([An idea]) --> B[Lay it out]
+  B --> C{Does it make sense?}
+  C -->|Yes| D[Give it shape]
+  D --> E([Share])
+  C -->|Not yet| F[Step back]
   F -.-> B`,
   },
   {
     id: 'sequence',
-    label: 'Se répondre',
-    title: 'Les bonnes idées circulent.',
-    description:
-      'Qui parle à qui ? Une conversation rend les choses plus claires.',
+    label: 'Talk to each other',
+    title: 'Good ideas circulate.',
+    description: 'Who talks to whom? A conversation makes things clearer.',
     syntax: 'sequenceDiagram',
     source: `sequenceDiagram
-  participant A as Vous
-  participant B as Une idée
-  participant C as Le monde
-  A->>B: Et si on essayait ?
-  B-->>A: Pourquoi pas.
-  A->>B: Une première version
-  B->>C: À vous de jouer
-  C-->>A: Et si on allait plus loin ?`,
+  participant A as You
+  participant B as An idea
+  participant C as The world
+  A->>B: What if we tried?
+  B-->>A: Why not.
+  A->>B: A first version
+  B->>C: Your turn
+  C-->>A: What if we went further?`,
   },
   {
     id: 'state',
-    label: 'Changer d’état',
-    title: 'Tout est en devenir.',
-    description: 'Du premier jet au dernier détail, chaque étape compte.',
+    label: 'Change state',
+    title: 'Everything is becoming.',
+    description: 'From the first draft to the last detail, every step counts.',
     syntax: 'stateDiagram-v2',
     source: `stateDiagram-v2
-  state "Brouillon" as Draft
-  state "En cours" as Active
-  state "En pause" as Paused
-  state "C’est prêt" as Done
+  state "Draft" as Draft
+  state "In progress" as Active
+  state "Paused" as Paused
+  state "Ready" as Done
   [*] --> Draft
-  Draft --> Active: Se lancer
-  Active --> Paused: Souffler
-  Paused --> Active: Reprendre
-  Active --> Done: Peaufiner
+  Draft --> Active: Get started
+  Active --> Paused: Take a breath
+  Paused --> Active: Resume
+  Active --> Done: Refine
   Done --> [*]`,
   },
 ];

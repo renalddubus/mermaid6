@@ -12,6 +12,9 @@ import { importSource } from './importSource';
 import ExportDialog from './ExportDialog';
 import { exportImage, downloadImage, type ImageOptions } from './exportImage';
 import './editor.css';
+import { usePreferences } from '../preferences';
+import type { Values } from '../i18n/copy';
+import DiagramSvg from '../components/DiagramSvg';
 
 type Failure = ReturnType<typeof describeError>;
 
@@ -24,6 +27,7 @@ export default function EditorPage({
   restored: boolean;
   storageWarning: string;
 }) {
+  const { t, tx, locale } = usePreferences();
   const [source, setSource] = useState(initial.source);
   const [name, setName] = useState(initial.name);
   const [persisted, setPersisted] = useState<{
@@ -41,11 +45,11 @@ export default function EditorPage({
   } | null>(null);
   const [zoom, setZoom] = useState(100);
   const [mobilePanel, setMobilePanel] = useState('code');
-  const [notice, setNoticeValue] = useState({
-    text: restored ? 'Brouillon restauré depuis ce navigateur.' : '',
+  const [notice, setNoticeValue] = useState<{ text: string; values?: Values }>({
+    text: restored ? 'Draft restored from this browser.' : '',
   });
-  function setNotice(text: string) {
-    setNoticeValue({ text });
+  function setNotice(text: string, values?: Values) {
+    setNoticeValue({ text, values });
   }
   useEffect(() => {
     if (!notice.text) return;
@@ -54,6 +58,7 @@ export default function EditorPage({
   }, [notice]);
   const [replacement, setReplacement] = useState<{
     label: string;
+    translateLabel?: boolean;
     source: string;
     name: string;
   } | null>(null);
@@ -75,10 +80,10 @@ export default function EditorPage({
   const current = lastValid.source === source;
   const error = attempt?.source === source ? attempt.error : null;
   const status = current
-    ? 'Aperçu à jour'
+    ? 'Preview up to date'
     : error
-      ? 'Erreur à corriger'
-      : 'Mise à jour de l’aperçu…';
+      ? 'Fix the error'
+      : 'Updating the preview…';
 
   useEffect(() => {
     let cancelled = false;
@@ -99,8 +104,8 @@ export default function EditorPage({
     };
   }, [source]);
   useEffect(() => {
-    document.title = 'Mermaid6 — Éditeur';
-  }, []);
+    document.title = `Mermaid6 — ${t('Editor')}`;
+  }, [t]);
   useEffect(() => {
     if (!needsBackup) return;
     const warn = (event: BeforeUnloadEvent) => {
@@ -130,7 +135,7 @@ export default function EditorPage({
         .catch(() => {
           if (!cancelled)
             setStorageError(
-              'Enregistrement local impossible. Téléchargez votre source pour la conserver.',
+              'Local save unavailable. Download your source to keep it.',
             );
         });
     }, 350);
@@ -154,7 +159,7 @@ export default function EditorPage({
         setNotice(
           cause instanceof Error
             ? cause.message
-            : 'Lecture du fichier impossible.',
+            : 'The file could not be read.',
         );
     }
   }
@@ -170,8 +175,9 @@ export default function EditorPage({
     importSequence.current++;
     const document = {
       source: getSource(example, inks[0]),
-      name: 'mon-diagramme.mmd',
+      name: 'diagram.mmd',
       label: example.label,
+      translateLabel: true,
     };
     if (dirty || source !== initial.source) setReplacement(document);
     else replaceDocument(document);
@@ -187,7 +193,7 @@ export default function EditorPage({
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     setSaved(source);
-    setNotice('Source téléchargée.');
+    setNotice('Source downloaded.');
   }
   async function saveImage(options: ImageOptions) {
     if (!current || exportBusy) return;
@@ -200,14 +206,16 @@ export default function EditorPage({
       if (version !== exportAttempt.current) return;
       if (latestSource.current !== snapshot)
         throw new Error(
-          'Le code a changé. Attendez le nouvel aperçu et relancez l’export.',
+          'The code changed. Wait for the new preview and export again.',
         );
       downloadImage(blob, name, options.format);
-      setNotice(`Image ${options.format.toUpperCase()} téléchargée.`);
+      setNotice('{format} image downloaded.', {
+        format: options.format.toUpperCase(),
+      });
     } catch (cause) {
       if (version === exportAttempt.current)
         setExportError(
-          cause instanceof Error ? cause.message : 'L’export a échoué.',
+          cause instanceof Error ? cause.message : 'Export failed.',
         );
     } finally {
       if (version === exportAttempt.current) setExportBusy(false);
@@ -222,30 +230,30 @@ export default function EditorPage({
   async function copy() {
     try {
       await navigator.clipboard.writeText(source);
-      setNotice('Source copiée.');
+      setNotice('Source copied.');
     } catch {
-      setNotice('Copie indisponible : téléchargez votre source.');
+      setNotice('Copy unavailable: download your source.');
     }
   }
 
   return (
     <div className="editor-page">
       <header className="editor-header">
-        <a className="brand" href="/" aria-label="Mermaid6, accueil">
+        <a className="brand" href="/" aria-label={t('homeLabel')}>
           <img src="/favicon.svg" width="30" height="30" alt="" />
           <span>
             Mermaid<span className="brand-six">6</span>
           </span>
         </a>
         <span className="editor-breadcrumb">
-          / <h1>Éditeur</h1>
+          / <h1>{t('Editor')}</h1>
         </span>
         <div className="editor-header-actions">
           <input
             ref={fileInput}
             type="file"
             accept=".mmd"
-            aria-label="Importer un fichier Mermaid"
+            aria-label={t('Import a Mermaid file')}
             hidden
             onChange={(event) => {
               const file = event.target.files?.[0];
@@ -254,14 +262,14 @@ export default function EditorPage({
             }}
           />
           <button className="button" onClick={() => fileInput.current?.click()}>
-            Importer .mmd
+            {t('Import .mmd')}
           </button>
           <button className="button" onClick={() => setCatalogueOpen(true)}>
-            Parcourir les exemples
+            {t('Browse examples')}
           </button>
           <button className="button primary" onClick={download}>
             <Icon name="export" />
-            Télécharger .mmd
+            {t('Download .mmd')}
           </button>
         </div>
       </header>
@@ -269,42 +277,49 @@ export default function EditorPage({
         {sourceExample && (
           <p className="example-guidance">
             <strong>
-              {sourceExample.label}
-              {sourceExample.experimental ? ' · Expérimental' : ''}
+              {tx(sourceExample.label)}
+              {sourceExample.experimental ? ` · ${t('Experimental')}` : ''}
             </strong>
-            <span>{sourceExample.note}</span>
+            <span>{tx(sourceExample.note)}</span>
           </p>
         )}
         {replacement !== null && (
           <div className="replacement-notice" role="alert">
-            <p>Charger « {replacement.label} » remplacera votre code actuel.</p>
+            <p>
+              {t('Load “{name}”? This will replace your current code.', {
+                name: replacement.translateLabel
+                  ? tx(replacement.label)
+                  : replacement.label,
+              })}
+            </p>
             <button className="button" onClick={() => setReplacement(null)}>
-              Annuler
+              {t('Cancel')}
             </button>
             <button
               className="button primary"
               onClick={() => replaceDocument(replacement)}
             >
-              Remplacer le code
+              {t('Replace code')}
             </button>
           </div>
         )}
         <div
           className="editor-mobile-tabs"
           role="group"
-          aria-label="Panneau affiché"
+          aria-label={t('Displayed panel')}
         >
           <button
             aria-pressed={mobilePanel === 'code'}
             onClick={() => setMobilePanel('code')}
           >
-            Code
+            {t('Code')}
           </button>
           <button
             aria-pressed={mobilePanel === 'preview'}
             onClick={() => setMobilePanel('preview')}
           >
-            Aperçu {error && <span aria-label="erreur">!</span>}
+            {t('Preview')}
+            {error && <span aria-label={t('error')}>!</span>}
           </button>
         </div>
         <div className={`live-editor-grid show-${mobilePanel}`}>
@@ -312,27 +327,27 @@ export default function EditorPage({
             <header className="live-panel-heading">
               <h2 id="code-title">
                 <Icon name="code" />
-                Source Mermaid
+                {t('Mermaid source')}
               </h2>
               <button
                 className="icon-button"
                 onClick={() => void copy()}
-                aria-label="Copier la source"
+                aria-label={t('Copy source')}
               >
                 <Icon name="copy" />
               </button>
             </header>
             <CodeEditor value={source} onChange={setSource} />
             <footer className="code-footer">
-              <span id="code-help">
-                Tab pour quitter · ⌘/Ctrl Z pour annuler
-              </span>
+              <span id="code-help">{t('Tab to leave · ⌘/Ctrl Z to undo')}</span>
               <span
                 className={
                   source.length > MAX_SOURCE_LENGTH ? 'over-limit' : ''
                 }
               >
-                {source.length.toLocaleString('fr-FR')} caractères
+                {t('{count} characters', {
+                  count: source.length.toLocaleString(locale),
+                })}
               </span>
             </footer>
           </section>
@@ -341,25 +356,24 @@ export default function EditorPage({
             aria-labelledby="preview-title"
           >
             <header className="live-panel-heading">
-              <h2 id="preview-title">Aperçu en direct</h2>
+              <h2 id="preview-title">{t('Preview in real time')}</h2>
               <span
                 className={`render-status ${current ? 'ready' : error ? 'failed' : 'pending'}`}
                 role="status"
               >
-                {status}
+                {tx(status)}
               </span>
             </header>
             {error && (
               <div className="render-error" role="alert">
-                <strong>{error.title}</strong>
+                <strong>{tx(error.title, { line: error.line ?? '' })}</strong>
                 <p>
-                  Votre texte est conservé.
-                  {lastValid.svg &&
-                    ' Le dernier aperçu valide est affiché ci-dessous.'}
+                  {t('Your text is preserved.')}
+                  {lastValid.svg && t('The last valid preview is shown below.')}
                 </p>
                 <details>
-                  <summary>Détails de l’erreur</summary>
-                  <pre>{error.detail}</pre>
+                  <summary>{t('Error details')}</summary>
+                  <pre>{tx(error.detail)}</pre>
                 </details>
               </div>
             )}
@@ -367,7 +381,7 @@ export default function EditorPage({
               className="live-preview-scroll"
               tabIndex={0}
               role="region"
-              aria-label="Diagramme, utilisez le zoom puis faites défiler"
+              aria-label={t('Diagram, use zoom then scroll')}
               aria-busy={!current && !error}
             >
               <div
@@ -375,17 +389,14 @@ export default function EditorPage({
                 style={{ '--zoom': zoom / 100 } as CSSProperties}
               >
                 {lastValid.svg ? (
-                  <div
-                    className="svg-content"
-                    dangerouslySetInnerHTML={{ __html: lastValid.svg }}
-                  />
+                  <DiagramSvg svg={lastValid.svg} />
                 ) : (
                   <div className="preview-placeholder">
                     <Icon name="flow" />
                     <p>
                       {error
-                        ? 'Corrigez le code pour afficher votre diagramme.'
-                        : 'Préparation du diagramme…'}
+                        ? t('Fix the code to display your diagram.')
+                        : t('Preparing the diagram…')}
                     </p>
                   </div>
                 )}
@@ -400,15 +411,16 @@ export default function EditorPage({
                   setExportOpen(true);
                 }}
               >
-                Exporter l’image <Icon name="export" />
+                {t('Export image')}
+                <Icon name="export" />
               </button>
               <div
                 className="zoom-tools"
                 role="group"
-                aria-label="Zoom du diagramme"
+                aria-label={t('Diagram zoom')}
               >
                 <button
-                  aria-label="Réduire"
+                  aria-label={t('Zoom out')}
                   disabled={zoom <= 40}
                   onClick={() => setZoom(zoom - 20)}
                 >
@@ -416,13 +428,13 @@ export default function EditorPage({
                 </button>
                 <button
                   className="zoom-reset"
-                  aria-label="Réinitialiser le zoom"
+                  aria-label={t('Reset zoom')}
                   onClick={() => setZoom(100)}
                 >
                   {zoom}%
                 </button>
                 <button
-                  aria-label="Agrandir"
+                  aria-label={t('Zoom in')}
                   disabled={zoom >= 300}
                   onClick={() => setZoom(zoom + 20)}
                 >
@@ -434,17 +446,15 @@ export default function EditorPage({
         </div>
         <footer className="editor-bottom">
           <span role="status" className={storageError ? 'over-limit' : ''}>
-            {storageError ||
+            {tx(storageError) ||
               (locallySaved
-                ? 'Brouillon enregistré dans ce navigateur.'
-                : 'Enregistrement du brouillon…')}
+                ? t('Draft saved in this browser.')
+                : t('Saving the draft…'))}
           </span>
           <span className="draft-filename">
-            {name} · Un seul brouillon local. Téléchargez-le pour le partager.
+            {name} · {t('One local draft. Download it to share.')}
           </span>
-          <span>
-            Styles par élément : utilisez la syntaxe Mermaid dans le code.
-          </span>
+          <span>{t('Element styles: use Mermaid syntax in the code.')}</span>
         </footer>
       </main>
       {exportOpen && (
@@ -469,9 +479,9 @@ export default function EditorPage({
       )}
       {notice.text && (
         <div className="announcement" role="status">
-          <span>{notice.text}</span>
+          <span>{tx(notice.text, notice.values)}</span>
           <button
-            aria-label="Fermer la notification"
+            aria-label={t('Close notification')}
             onClick={() => setNotice('')}
           >
             <Icon name="close" />

@@ -14,9 +14,9 @@ for (const example of catalogue) {
     await expect(svg).toBeVisible();
     expect(await svg.locator('text').count()).toBeGreaterThan(0);
     const labels: Record<string, string[]> = {
-      event: ['Editeur', 'CreerDiagramme', 'DiagrammeCree'],
-      journey: ['Découverte', 'Création', 'Retour'],
-      swimlane: ['Auteur', 'Lecteur'],
+      event: ['Editor', 'CreateDiagram', 'DiagramCreated'],
+      journey: ['Discovery', 'Creation', 'Return'],
+      swimlane: ['Author', 'Reader'],
     };
     for (const label of labels[example.id] ?? []) {
       const text = svg.locator('tspan').filter({ hasText: label });
@@ -49,7 +49,7 @@ for (const example of catalogue) {
     await expect(svg).toBeVisible();
     if (example.id === 'journey')
       await expect(
-        svg.locator('tspan').filter({ hasText: 'Découverte' }),
+        svg.locator('tspan').filter({ hasText: 'Discovery' }),
       ).toHaveCSS('fill', 'rgb(41, 41, 35)');
     expect(errors).toEqual([]);
   });

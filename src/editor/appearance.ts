@@ -4,35 +4,35 @@ import type { ColorProfile } from '../catalogue';
 export type ColorField = { key: string; label: string; fallback: string };
 export const colorFields: Record<ColorProfile, ColorField[]> = {
   nodes: [
-    { key: 'primaryColor', label: 'Fond des éléments', fallback: '#ffe7ed' },
+    { key: 'primaryColor', label: 'Element background', fallback: '#ffe7ed' },
     {
       key: 'primaryBorderColor',
-      label: 'Contour des éléments',
+      label: 'Element border',
       fallback: '#d93655',
     },
     {
       key: 'primaryTextColor',
-      label: 'Texte des éléments',
+      label: 'Element text',
       fallback: '#292923',
     },
   ],
   actors: [
-    { key: 'actorBkg', label: 'Fond des participants', fallback: '#ffe7ed' },
+    { key: 'actorBkg', label: 'Participant background', fallback: '#ffe7ed' },
     {
       key: 'actorBorder',
-      label: 'Contour des participants',
+      label: 'Participant border',
       fallback: '#d93655',
     },
     {
       key: 'actorTextColor',
-      label: 'Texte des participants',
+      label: 'Participant text',
       fallback: '#292923',
     },
   ],
   pie: [
-    { key: 'pie1', label: 'Part 1', fallback: '#d93655' },
-    { key: 'pie2', label: 'Part 2', fallback: '#3158bc' },
-    { key: 'pie3', label: 'Part 3', fallback: '#28715b' },
+    { key: 'pie1', label: 'Slice 1', fallback: '#d93655' },
+    { key: 'pie2', label: 'Slice 2', fallback: '#3158bc' },
+    { key: 'pie3', label: 'Slice 3', fallback: '#28715b' },
   ],
   sections: [
     { key: 'cScale0', label: 'Section 1', fallback: '#ffe7ed' },
@@ -40,24 +40,24 @@ export const colorFields: Record<ColorProfile, ColorField[]> = {
     { key: 'cScale2', label: 'Section 3', fallback: '#dce9df' },
   ],
   branches: [
-    { key: 'cScale1', label: 'Branche 1', fallback: '#ffe7ed' },
-    { key: 'cScale2', label: 'Branche 2', fallback: '#dde5f7' },
-    { key: 'cScale3', label: 'Branche 3', fallback: '#dce9df' },
+    { key: 'cScale1', label: 'Branch 1', fallback: '#ffe7ed' },
+    { key: 'cScale2', label: 'Branch 2', fallback: '#dde5f7' },
+    { key: 'cScale3', label: 'Branch 3', fallback: '#dce9df' },
   ],
   journey: [
-    { key: 'fillType0', label: 'Étape 1', fallback: '#ffe7ed' },
-    { key: 'fillType1', label: 'Étape 2', fallback: '#dde5f7' },
-    { key: 'fillType2', label: 'Étape 3', fallback: '#dce9df' },
+    { key: 'fillType0', label: 'Step 1', fallback: '#ffe7ed' },
+    { key: 'fillType1', label: 'Step 2', fallback: '#dde5f7' },
+    { key: 'fillType2', label: 'Step 3', fallback: '#dce9df' },
   ],
   code: [],
 };
 
 export const themes = [
-  { value: 'base', label: 'Personnalisé' },
-  { value: 'default', label: 'Clair' },
-  { value: 'dark', label: 'Sombre' },
-  { value: 'neutral', label: 'Neutre' },
-  { value: 'forest', label: 'Forêt' },
+  { value: 'base', label: 'Custom' },
+  { value: 'default', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'neutral', label: 'Neutral' },
+  { value: 'forest', label: 'Forest' },
 ];
 
 function frontmatter(source: string) {
@@ -66,20 +66,18 @@ function frontmatter(source: string) {
   const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
   if (!match && source.startsWith('---'))
     throw new Error(
-      'Fermez la configuration YAML avec une ligne « --- » avant de modifier le thème.',
+      'Close the YAML configuration with a “---” line before changing the theme.',
     );
   const document = match
     ? parseDocument(match[1], { uniqueKeys: true })
     : new Document({});
   if (document.errors.length || !isMap(document.contents))
-    throw new Error(
-      'Corrigez la configuration YAML avant de modifier le thème.',
-    );
+    throw new Error('Fix the YAML configuration before changing the theme.');
   if (document.has('config') && !isMap(document.get('config')))
-    throw new Error('La configuration doit être un objet YAML.');
+    throw new Error('The configuration must be a YAML object.');
   const variables = document.getIn(['config', 'themeVariables']);
   if (variables !== undefined && !isMap(variables))
-    throw new Error('themeVariables doit être un objet YAML.');
+    throw new Error('themeVariables must be a YAML object.');
   return {
     document,
     prefix,

@@ -3,6 +3,8 @@ import { catalogue } from '../catalogue';
 import { getSource, inks } from '../models';
 import { readDraft, type Draft } from './drafts';
 import EditorPage from './EditorPage';
+import { usePreferences } from '../preferences';
+import { translateText } from '../i18n/copy';
 
 function requestedDocument(): Draft {
   const params = new URLSearchParams(window.location.search);
@@ -10,13 +12,15 @@ function requestedDocument(): Draft {
   const ink = inks[Number(params.get('ink'))] ?? inks[0];
   return {
     source: getSource(model ?? catalogue[0], ink),
-    name: 'mon-diagramme.mmd',
-    origin: model ? `${model.id}:${ink.name}` : '',
+    name: 'diagram.mmd',
+    // Draft origins predate i18n. Retain their legacy ink names in storage.
+    origin: model ? `${model.id}:${translateText('fr', ink.name)}` : '',
     updatedAt: Date.now(),
   };
 }
 
 export default function EditorEntry() {
+  const { t } = usePreferences();
   const [requested] = useState(requestedDocument);
   const [initial, setInitial] = useState<Draft | null>(null);
   const [conflict, setConflict] = useState<Draft | null>(null);
@@ -45,7 +49,7 @@ export default function EditorEntry() {
         if (!cancelled) {
           setInitial(requested);
           setWarning(
-            'Stockage local indisponible ou brouillon illisible. Téléchargez votre source pour la conserver.',
+            'Local storage is unavailable or the draft is unreadable. Download your source to keep it.',
           );
         }
       });
@@ -65,10 +69,12 @@ export default function EditorEntry() {
     <main className="draft-start">
       {conflict ? (
         <section>
-          <h1>Un brouillon vous attend</h1>
+          <h1>{t('A draft is waiting for you')}</h1>
           <p>
-            « {conflict.name} » est déjà enregistré dans ce navigateur. Charger
-            cet exemple le remplacera.
+            {t(
+              '“{name}” is already saved in this browser. Loading this example will replace it.',
+              { name: conflict.name },
+            )}
           </p>
           <div className="draft-start-actions">
             <button
@@ -78,15 +84,15 @@ export default function EditorEntry() {
                 setRestored(true);
               }}
             >
-              Reprendre mon brouillon
+              {t('Resume my draft')}
             </button>
             <button className="button" onClick={() => setInitial(requested)}>
-              Remplacer par l’exemple
+              {t('Replace with example')}
             </button>
           </div>
         </section>
       ) : (
-        <p role="status">Recherche de votre brouillon…</p>
+        <p role="status">{t('Looking for your draft…')}</p>
       )}
     </main>
   );

@@ -1,12 +1,14 @@
 /* eslint-disable react-refresh/only-export-components */
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
   type ReactNode,
 } from 'react';
+import { copy, translateText, type CopyKey, type Values } from './i18n/copy';
 
 export type Locale = 'en' | 'fr' | 'es' | 'de';
 export type LanguagePreference = Locale | 'system';
@@ -261,7 +263,8 @@ type PreferencesContextValue = {
   storageError: boolean;
   setLanguage: (language: LanguagePreference) => void;
   setTheme: (theme: AppTheme) => void;
-  t: (key: MessageKey, values?: Record<string, string>) => string;
+  t: (key: MessageKey | CopyKey, values?: Values) => string;
+  tx: (message: string, values?: Values) => string;
 };
 
 const PreferencesContext = createContext<PreferencesContextValue | null>(null);
@@ -305,11 +308,33 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const t = (key: MessageKey, values: Record<string, string> = {}) =>
-    Object.entries(values).reduce(
-      (message, [name, value]) => message.replaceAll(`{${name}}`, value),
-      translations[locale][key] ?? english[key],
-    );
+  const tx = useCallback(
+    (message: string, values: Values = {}) =>
+      translateText(locale, message, values),
+    [locale],
+  );
+  const t = useCallback(
+    (key: MessageKey | CopyKey, values: Values = {}) => {
+      if (Object.hasOwn(copy, key)) return tx(key, values);
+      const message =
+        translations[locale][key as MessageKey] ?? english[key as MessageKey];
+      return message.replace(/\{(\w+)\}/g, (placeholder, name: string) =>
+        Object.hasOwn(values, name) ? String(values[name]) : placeholder,
+      );
+    },
+    [locale, tx],
+  );
+
+  useEffect(() => {
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute(
+        'content',
+        t(
+          'Mermaid6, your open-source space to create, customize, and export Mermaid diagrams.',
+        ),
+      );
+  }, [t]);
 
   return (
     <PreferencesContext.Provider
@@ -320,6 +345,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
         setLanguage: (language) => update({ ...preferences, language }),
         setTheme: (theme) => update({ ...preferences, theme }),
         t,
+        tx,
       }}
     >
       {children}

@@ -30,13 +30,13 @@ for (const item of catalogue) {
     await page.getByLabel('Fond', { exact: true }).selectOption('transparent');
     await page.getByLabel('Résolution', { exact: true }).selectOption('1');
     const png = await download(page, 'PNG');
-    expect(png.name).toBe('mon-diagramme.png');
+    expect(png.name).toBe('diagram.png');
     expect([...png.buffer.subarray(0, 8)]).toEqual([
       137, 80, 78, 71, 13, 10, 26, 10,
     ]);
     await page.getByLabel('Format', { exact: true }).selectOption('svg');
     const svg = await download(page, 'SVG');
-    expect(svg.name).toBe('mon-diagramme.svg');
+    expect(svg.name).toBe('diagram.svg');
     const report = await page.evaluate(
       async ({ svg, png }) => {
         // Decode as UTF-8 so labels with accents are compared correctly.
@@ -262,5 +262,5 @@ test('la fermeture annule un téléchargement encore en préparation', async ({
   await openExport(page);
   await page.getByLabel('Format', { exact: true }).selectOption('svg');
   await download(page, 'SVG');
-  expect(downloads).toEqual(['mon-diagramme.svg']);
+  expect(downloads).toEqual(['diagram.svg']);
 });

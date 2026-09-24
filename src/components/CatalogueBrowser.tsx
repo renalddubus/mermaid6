@@ -8,22 +8,25 @@ import {
 import { getSource, inks } from '../models';
 import { renderDiagram, describeError } from '../editor/render';
 import Icon from './Icon';
+import { usePreferences } from '../preferences';
 import './catalogue.css';
+import DiagramSvg from './DiagramSvg';
 
 export default function CatalogueBrowser({
   onChoose,
 }: {
   onChoose?: (example: DiagramExample) => void;
 }) {
+  const { t, tx, locale } = usePreferences();
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('Tous');
+  const [category, setCategory] = useState('All');
   const [selected, setSelected] = useState('flow');
   const [preview, setPreview] = useState({ id: '', svg: '', error: '' });
   const visible = catalogue.filter(
     (item) =>
-      (category === 'Tous' || item.category === category) &&
+      (category === 'All' || item.category === category) &&
       normalizeSearch(
-        `${item.label} ${item.description} ${item.syntax}`,
+        `${tx(item.label)} ${tx(item.description)} ${tx(item.category)} ${item.syntax} ${item.id}`,
       ).includes(normalizeSearch(query.trim())),
   );
   const current = visible.find((item) => item.id === selected) ?? visible[0];
@@ -58,8 +61,8 @@ export default function CatalogueBrowser({
           <Icon name="search" />
           <input
             type="search"
-            aria-label="Rechercher dans le catalogue"
-            placeholder="Une idée, un type de diagramme…"
+            aria-label={t('Search the catalogue')}
+            placeholder={t('An idea, a diagram type…')}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
@@ -67,28 +70,33 @@ export default function CatalogueBrowser({
         <div
           className="catalogue-categories"
           role="group"
-          aria-label="Filtrer par usage"
+          aria-label={t('Filter by use')}
         >
-          {['Tous', ...categories].map((name) => (
+          {['All', ...categories].map((name) => (
             <button
-              key={name}
+              key={tx(name)}
               aria-pressed={category === name}
               onClick={() => setCategory(name)}
             >
-              {name}
+              {tx(name)}
             </button>
           ))}
         </div>
       </div>
       <p className="catalogue-count" role="status">
-        {visible.length} exemple{visible.length !== 1 ? 's' : ''}
+        {t(
+          new Intl.PluralRules(locale).select(visible.length) === 'one'
+            ? '{count} available example'
+            : '{count} available examples',
+          { count: visible.length.toLocaleString(locale) },
+        )}
       </p>
       {current ? (
         <div className="catalogue-layout">
           <div
             className="catalogue-list"
             role="group"
-            aria-label="Exemples de diagrammes"
+            aria-label={t('Mermaid examples')}
           >
             {visible.map((item) => (
               <button
@@ -98,13 +106,13 @@ export default function CatalogueBrowser({
                 onClick={() => setSelected(item.id)}
               >
                 <span className="catalogue-item-name">
-                  {item.label}
+                  {tx(item.label)}
                   <Icon name="arrow" />
                 </span>
-                <span>{item.description}</span>
+                <span>{tx(item.description)}</span>
                 <small>
-                  {item.category}
-                  {item.experimental ? ' · Expérimental' : ''}
+                  {tx(item.category)}
+                  {item.experimental ? ` · ${t('Experimental')}` : ''}
                 </small>
               </button>
             ))}
@@ -114,36 +122,32 @@ export default function CatalogueBrowser({
             aria-labelledby="catalogue-example-title"
           >
             <div className="catalogue-detail-heading">
-              <span className="section-eyebrow">{current.category}</span>
-              <h2 id="catalogue-example-title">{current.label}</h2>
-              <p>{current.description}</p>
+              <span className="section-eyebrow">{tx(current.category)}</span>
+              <h2 id="catalogue-example-title">{tx(current.label)}</h2>
+              <p>{tx(current.description)}</p>
             </div>
             <div
               className="catalogue-preview"
-              aria-label="Aperçu de l’exemple"
+              aria-label={t('Example preview')}
               aria-busy={preview.id !== current.id}
             >
               {preview.id !== current.id ? (
-                <p>Préparation de l’aperçu…</p>
+                <p>{t('Preparing the preview…')}</p>
               ) : preview.error ? (
                 <p role="alert">
-                  Cet aperçu n’a pas pu être chargé. Essayez un autre exemple.
+                  {t('This preview could not be loaded. Try another example.')}
                 </p>
               ) : (
-                <div
-                  className="svg-content"
-                  dangerouslySetInnerHTML={{ __html: preview.svg }}
-                />
+                <DiagramSvg svg={preview.svg} />
               )}
             </div>
             <div className="catalogue-detail-bottom">
               <p className="catalogue-note">
-                <strong>Personnalisation.</strong> {current.note}
+                <strong>{t('Customization.')}</strong> {tx(current.note)}
               </p>
               {current.experimental && (
                 <p className="catalogue-note">
-                  Syntaxe expérimentale : elle peut évoluer lors d’une mise à
-                  jour de Mermaid.
+                  {t('Experimental syntax: it may change in a Mermaid update.')}
                 </p>
               )}
               <div className="catalogue-detail-actions">
@@ -152,22 +156,24 @@ export default function CatalogueBrowser({
                     className="button primary"
                     onClick={() => onChoose(current)}
                   >
-                    Utiliser cet exemple <Icon name="arrow" />
+                    {t('Use this example')}
+                    <Icon name="arrow" />
                   </button>
                 ) : (
                   <a
                     className="button primary"
                     href={`/editor?example=${current.id}`}
                   >
-                    Utiliser cet exemple <Icon name="arrow" />
+                    {t('Use this example')}
+                    <Icon name="arrow" />
                   </a>
                 )}
                 <a href={current.docs} target="_blank" rel="noreferrer">
-                  Guide de syntaxe ↗
+                  {t('Syntax guide ↗')}
                 </a>
               </div>
               <details className="catalogue-source">
-                <summary>Voir le code Mermaid</summary>
+                <summary>{t('View Mermaid code')}</summary>
                 <pre>{getSource(current, inks[0])}</pre>
               </details>
             </div>
@@ -175,21 +181,22 @@ export default function CatalogueBrowser({
         </div>
       ) : (
         <div className="catalogue-empty">
-          <p>Aucun exemple ne correspond à votre recherche.</p>
+          <p>{t('No examples match your search.')}</p>
           <button
             className="button"
             onClick={() => {
               setQuery('');
-              setCategory('Tous');
+              setCategory('All');
             }}
           >
-            Afficher tous les exemples
+            {t('Show all examples')}
           </button>
         </div>
       )}
       <p className="catalogue-footnote">
-        Exemples rendus avec Mermaid 12 et exportables en SVG ou PNG. ZenUML
-        nécessite une extension non installée.
+        {t(
+          'Examples rendered with Mermaid 12 and exportable as SVG or PNG. ZenUML requires an extension that is not installed.',
+        )}
       </p>
     </div>
   );

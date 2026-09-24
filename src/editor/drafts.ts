@@ -16,7 +16,7 @@ function openDatabase() {
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
       request.onblocked = () =>
-        reject(new Error('Stockage occupé dans un autre onglet.'));
+        reject(new Error('Storage is busy in another tab.'));
     }).catch((error) => {
       database = undefined;
       throw error;
@@ -44,7 +44,7 @@ export async function readDraft(): Promise<Draft | null> {
         !('updatedAt' in value) ||
         typeof value.updatedAt !== 'number'
       )
-        return reject(new Error('Brouillon illisible.'));
+        return reject(new Error('The draft cannot be read.'));
       resolve(value as Draft);
     };
     transaction.onerror = () => reject(transaction.error);

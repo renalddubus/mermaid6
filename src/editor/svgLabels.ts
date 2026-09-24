@@ -5,7 +5,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 export function normalizeSvgLabels(svg: string, color: unknown) {
   const document = new DOMParser().parseFromString(svg, 'image/svg+xml');
   if (document.querySelector('parsererror'))
-    throw new Error('Le diagramme n’a pas pu être affiché.');
+    throw new Error('The diagram could not be displayed.');
   const fill =
     typeof color === 'string' && /^#[\da-f]{3,8}$/i.test(color)
       ? color

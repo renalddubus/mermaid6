@@ -40,12 +40,10 @@ export function renderDiagram(source: string, isCurrent: () => boolean) {
   const result = queue.then(async () => {
     if (!isCurrent()) return null;
     if (!source.trim())
-      throw new Error(
-        'Écrivez un diagramme ou choisissez un exemple pour commencer.',
-      );
+      throw new Error('Write a diagram or choose an example to get started.');
     if (source.length > MAX_SOURCE_LENGTH)
       throw new Error(
-        'Ce diagramme dépasse la limite de 50 000 caractères. Réduisez sa taille pour afficher l’aperçu.',
+        'This diagram exceeds the 50,000-character limit. Reduce its size to display the preview.',
       );
     mermaid.initialize({
       startOnLoad: false,
@@ -96,7 +94,7 @@ export function renderDiagram(source: string, isCurrent: () => boolean) {
       const parsed = new DOMParser().parseFromString(safe, 'image/svg+xml');
       const element = parsed.documentElement;
       if (element.localName !== 'svg' || parsed.querySelector('parsererror'))
-        throw new Error('Le diagramme n’a pas pu être affiché.');
+        throw new Error('The diagram could not be displayed.');
       element.setAttribute('width', '100%');
       element.setAttribute('height', '100%');
       element.setAttribute(
@@ -104,7 +102,7 @@ export function renderDiagram(source: string, isCurrent: () => boolean) {
         'max-width: none; width: 100%; height: 100%; font-family: Arial, sans-serif;',
       );
       element.setAttribute('role', 'img');
-      element.setAttribute('aria-label', 'Diagramme Mermaid');
+      element.setAttribute('aria-label', 'Mermaid diagram');
       return new XMLSerializer().serializeToString(element);
     } finally {
       container.remove();
@@ -119,8 +117,9 @@ export function describeError(error: unknown) {
   const line = message.match(/(?:line|ligne)\s+(\d+)/i)?.[1];
   return {
     title: line
-      ? `Erreur de syntaxe à la ligne ${line}`
-      : 'Le diagramme ne peut pas être affiché',
+      ? 'Syntax error on line {line}'
+      : 'The diagram cannot be displayed',
     detail: message.slice(0, 1800),
+    line,
   };
 }

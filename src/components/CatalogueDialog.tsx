@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { DiagramExample } from '../catalogue';
 import CatalogueBrowser from './CatalogueBrowser';
 import Icon from './Icon';
+import { usePreferences } from '../preferences';
 
 export default function CatalogueDialog({
   onChoose,
@@ -10,6 +11,7 @@ export default function CatalogueDialog({
   onChoose: (example: DiagramExample) => void;
   onClose: () => void;
 }) {
+  const { t } = usePreferences();
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const element = dialog.current!;
@@ -32,11 +34,11 @@ export default function CatalogueDialog({
       onCancel={onClose}
     >
       <header className="catalogue-dialog-header">
-        <h2 id="catalogue-dialog-title">Trouver un point de départ</h2>
+        <h2 id="catalogue-dialog-title">{t('Find a starting point')}</h2>
         <button
           className="icon-button"
           onClick={onClose}
-          aria-label="Fermer le catalogue"
+          aria-label={t('Close catalogue')}
         >
           <Icon name="close" />
         </button>

@@ -12,7 +12,7 @@ function parseSvg(svg: string) {
     parsed.querySelector('parsererror') ||
     parsed.documentElement.localName !== 'svg'
   )
-    throw new Error('L’aperçu ne peut pas être exporté.');
+    throw new Error('The preview cannot be exported.');
   return parsed.documentElement;
 }
 export function imageSize(svg: string, scale = 1) {
@@ -27,7 +27,7 @@ export function imageSize(svg: string, scale = 1) {
     height <= 0 ||
     scale <= 0
   )
-    throw new Error('Les dimensions du diagramme sont invalides.');
+    throw new Error('The diagram dimensions are invalid.');
   return {
     x,
     y,
@@ -39,7 +39,7 @@ export function imageSize(svg: string, scale = 1) {
 }
 export function pngSizeError(width: number, height: number) {
   return width > MAX_SIDE || height > MAX_SIDE || width * height > MAX_PIXELS
-    ? 'Image trop grande pour le PNG. Réduisez la résolution ou choisissez le SVG (maximum 16 384 px par côté et 32 millions de pixels).'
+    ? 'The image is too large for PNG. Reduce the resolution or choose SVG (maximum 16,384 px per side and 32 million pixels).'
     : '';
 }
 
@@ -51,9 +51,7 @@ export function standaloneSvg(svg: string, background: string | null) {
   for (const element of [root, ...root.querySelectorAll('*')]) {
     for (const attribute of element.attributes) {
       if (attribute.localName === 'href' && !attribute.value.startsWith('#'))
-        throw new Error(
-          'Les ressources externes ne peuvent pas être exportées.',
-        );
+        throw new Error('External resources cannot be exported.');
       if (attribute.localName === 'style') validateCss(attribute.value);
     }
     if (element.localName === 'style') validateCss(element.textContent ?? '');
@@ -66,7 +64,7 @@ export function standaloneSvg(svg: string, background: string | null) {
   );
   if (background) {
     if (!/^#[\da-f]{6}$/i.test(background))
-      throw new Error('La couleur de fond est invalide.');
+      throw new Error('The background color is invalid.');
     const rect = root.ownerDocument.createElementNS(
       'http://www.w3.org/2000/svg',
       'rect',
@@ -84,9 +82,7 @@ export function standaloneSvg(svg: string, background: string | null) {
 
 function validateCss(value: string) {
   if (/@import|@font-face|\\/i.test(value))
-    throw new Error(
-      'Ce style contient une ressource non prise en charge pour l’export.',
-    );
+    throw new Error('This style contains a resource that cannot be exported.');
   for (const match of value.matchAll(/url\s*\(([^)]*)\)/gi)) {
     if (
       !match[1]
@@ -94,7 +90,7 @@ function validateCss(value: string) {
         .replace(/^["']|["']$/g, '')
         .startsWith('#')
     )
-      throw new Error('Les ressources externes ne peuvent pas être exportées.');
+      throw new Error('External resources cannot be exported.');
   }
 }
 
@@ -102,8 +98,7 @@ function dataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () =>
-      reject(new Error('La préparation de l’image a échoué.'));
+    reader.onerror = () => reject(new Error('Image preparation failed.'));
     reader.readAsDataURL(blob);
   });
 }
@@ -131,9 +126,7 @@ export async function exportImage(svg: string, options: ImageOptions) {
   try {
     const context = canvas.getContext('2d');
     if (!context)
-      throw new Error(
-        'Le navigateur ne peut pas créer cette image. Essayez le SVG.',
-      );
+      throw new Error('The browser cannot create this image. Try SVG.');
     context.drawImage(image, 0, 0, size.width, size.height);
     return await new Promise<Blob>((resolve, reject) =>
       canvas.toBlob(
@@ -141,9 +134,7 @@ export async function exportImage(svg: string, options: ImageOptions) {
           result
             ? resolve(result)
             : reject(
-                new Error(
-                  'La conversion PNG a échoué. Réduisez la résolution.',
-                ),
+                new Error('PNG conversion failed. Reduce the resolution.'),
               ),
         'image/png',
       ),
@@ -162,7 +153,7 @@ export function downloadImage(
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `${sourceName.replace(/\.mmd$/i, '') || 'mon-diagramme'}.${format}`;
+  link.download = `${sourceName.replace(/\.mmd$/i, '') || 'diagram'}.${format}`;
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

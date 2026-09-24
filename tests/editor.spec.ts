@@ -70,7 +70,7 @@ test('l’accueil transmet son exemple à l’éditeur', async ({ page }) => {
   await expect(
     page.getByRole('img', { name: 'Diagramme Mermaid' }),
   ).toBeVisible();
-  await expect(page.locator('.svg-content')).toContainText('Une idée');
+  await expect(page.locator('.svg-content')).toContainText('An idea');
 });
 
 test('édition, erreur, reprise, zoom et téléchargement de la source', async ({
