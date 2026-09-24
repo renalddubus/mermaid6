@@ -11,6 +11,25 @@
   --muted: #535f70;
   --subtle: #657084;
   --mono: 'SFMono-Regular', Consolas, monospace;
+  --surface: #fff;
+  --surface-raised: #fff;
+  --surface-soft: #fafbfe;
+  --text: #242633;
+  --helper-size: 1rem;
+  --helper-line-height: 1.5;
+}
+
+:root[data-app-theme='dark'] {
+  --surface: #171920;
+  --surface-raised: #22252f;
+  --surface-soft: #292d38;
+  --text: #f2f3f7;
+  --muted: #c4c9d4;
+  --subtle: #aeb6c7;
+  --border: #3b404d;
+  --accent-wash: #4a2630;
+  color: var(--text);
+  background: var(--surface);
 }
 html {
   scroll-behavior: smooth;
@@ -26,6 +45,234 @@ html {
 body {
   margin: 0;
   min-width: 320px;
+  color: var(--text);
+  background: var(--surface);
+}
+
+.settings-button {
+  position: fixed;
+  z-index: 15;
+  right: 18px;
+  bottom: 18px;
+  box-shadow: 0 8px 28px #0003;
+  background: var(--surface-raised);
+}
+
+.settings-dialog {
+  width: min(440px, calc(100% - 32px));
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 24px 80px #0005;
+}
+
+.settings-dialog::backdrop {
+  background: #101219aa;
+  backdrop-filter: blur(3px);
+}
+
+.settings-dialog header,
+.route-state-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-dialog h2 {
+  margin: 0;
+}
+
+.settings-field {
+  display: grid;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.settings-field > span,
+.settings-theme legend {
+  font-weight: 650;
+}
+
+.settings-field select {
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  background: var(--surface-soft);
+  font: inherit;
+}
+
+.settings-field small,
+.settings-help,
+.settings-warning {
+  font-size: var(--helper-size) !important;
+  line-height: var(--helper-line-height) !important;
+  color: var(--muted);
+}
+
+.settings-theme {
+  display: flex;
+  gap: 18px;
+  border: 0;
+  margin: 24px 0 0;
+  padding: 0;
+}
+
+.settings-theme legend {
+  margin-bottom: 10px;
+}
+
+.settings-theme label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.settings-warning {
+  color: #d8899b;
+}
+
+.route-state {
+  min-height: 100svh;
+  padding: 24px clamp(20px, 5vw, 72px);
+  color: var(--text);
+  background: var(--surface);
+}
+
+.route-state-card {
+  width: min(620px, 100%);
+  min-height: 340px;
+  margin: clamp(48px, 12vh, 120px) auto 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 18px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-raised);
+  padding: 32px;
+}
+
+.route-state-card h1,
+.route-state-card p {
+  margin: 0;
+}
+
+.route-state-card p {
+  color: var(--muted);
+  font-size: var(--helper-size);
+  line-height: var(--helper-line-height);
+}
+
+.loading-indicator {
+  width: 34px;
+  height: 34px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: route-spin 0.8s linear infinite;
+}
+
+@keyframes route-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-indicator {
+    animation: none;
+    border-top-color: var(--border);
+  }
+}
+
+/* Supporting copy is readable on every page and is never reduced on mobile. */
+:where(
+  .hero > p,
+  .discovery-heading p,
+  .example-description,
+  .empty-state,
+  .workspace-header p,
+  .source-caption,
+  .preview-footer > span,
+  .tip p,
+  .about-copy > p,
+  .page-footer > span,
+  .catalogue-home-link,
+  .announcement,
+  .example-guidance,
+  .catalogue-count,
+  .catalogue-item,
+  .catalogue-note,
+  .catalogue-footnote,
+  .catalogue-detail-heading p,
+  .catalogue-preview > p,
+  .editor-bottom,
+  .code-footer,
+  .render-status,
+  .render-error,
+  .replacement-notice p,
+  .export-help,
+  .export-dimensions,
+  .export-error
+) {
+  font-size: var(--helper-size) !important;
+  line-height: var(--helper-line-height) !important;
+}
+
+:root[data-app-theme='dark']
+  :where(
+    .site-header,
+    .workspace,
+    .source-panel,
+    .preview,
+    .example-card,
+    .catalogue-detail,
+    .catalogue-dialog,
+    .export-dialog,
+    .live-code-panel,
+    .live-preview-panel,
+    .live-panel-heading,
+    .replacement-notice,
+    .tip
+  ) {
+  color: var(--text);
+  background: var(--surface-raised);
+  border-color: var(--border);
+}
+
+:root[data-app-theme='dark']
+  :where(
+    .site-header a,
+    .catalogue-item-name,
+    .example-guidance strong,
+    .live-panel-heading h2,
+    .tip strong,
+    .editor-breadcrumb h1
+  ) {
+  color: var(--text);
+}
+
+:root[data-app-theme='dark'] :where(input, select, .code-editor .cm-editor) {
+  color: var(--text);
+  background: var(--surface-soft);
+}
+
+:root[data-app-theme='dark'] .code-editor .cm-gutters {
+  color: var(--subtle);
+  background: var(--surface-raised);
+  border-color: var(--border);
+}
+
+:root[data-app-theme='dark']
+  .code-editor
+  :where(.cm-activeLine, .cm-activeLineGutter) {
+  background: #343947;
 }
 button,
 input {

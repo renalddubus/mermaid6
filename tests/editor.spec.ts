@@ -1,4 +1,5 @@
 import { changeAppearance, colorFields } from '../src/editor/appearance';
+import { normalizeThemeColorsForRender } from '../src/editor/render';
 import { expect, test, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
@@ -8,6 +9,52 @@ const ready = (page: Page) =>
   expect(
     page.getByRole('status').filter({ hasText: 'Aperçu à jour' }),
   ).toBeVisible();
+
+test('unquoted theme colors are normalized only for rendering', () => {
+  const source = `---
+title: Keep #this comment
+config:
+  theme: base
+  themeVariables:
+    primaryColor: #aabbcc
+    lineColor: '#112233'
+---
+flowchart LR
+ A[Keep source]`;
+  const normalized = normalizeThemeColorsForRender(source);
+  expect(normalized).toContain("primaryColor: '#aabbcc'");
+  expect(normalized).toContain("lineColor: '#112233'");
+  expect(normalized).toContain('title: Keep #this comment');
+  expect(source).toContain('primaryColor: #aabbcc');
+});
+
+test('preview recovers after editing an unquoted configuration color', async ({
+  page,
+}) => {
+  await page.goto('/editor');
+  await ready(page);
+  await edit(
+    page,
+    '---\nconfig:\n  theme: base\n  themeVariables:\n    primaryColor: #aabbcc\n---\nflowchart LR\n A[Color] --> B[Preview]',
+  );
+  await expect(page.locator('.svg-content .node rect').first()).toHaveCSS(
+    'fill',
+    'rgb(170, 187, 204)',
+  );
+  await code(page).fill(
+    "---\nconfig:\n  theme: base\n  themeVariables:\n    primaryColor: '\n---\nflowchart LR\n A[Color] --> B[Preview]",
+  );
+  await expect(page.getByRole('alert')).toBeVisible();
+  await edit(
+    page,
+    '---\nconfig:\n  theme: base\n  themeVariables:\n    primaryColor: #ddeeff\n---\nflowchart LR\n A[Color] --> B[Preview]',
+  );
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await expect(page.locator('.svg-content .node rect').first()).toHaveCSS(
+    'fill',
+    'rgb(221, 238, 255)',
+  );
+});
 
 async function edit(page: Page, source: string) {
   await code(page).fill(source);

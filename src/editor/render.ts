@@ -6,6 +6,35 @@ export const MAX_SOURCE_LENGTH = 50_000;
 let counter = 0;
 let queue: Promise<unknown> = Promise.resolve();
 
+export function normalizeThemeColorsForRender(source: string) {
+  const bom = source.startsWith('\uFEFF') ? '\uFEFF' : '';
+  const content = source.slice(bom.length);
+  const match = content.match(/^(---\r?\n)([\s\S]*?)(\r?\n---(?:\r?\n|$))/);
+  if (!match) return source;
+  const lines = match[2].split(/\r?\n/);
+  let variablesIndent = -1;
+  const normalized = lines.map((line) => {
+    const indentation = line.match(/^\s*/)?.[0].length ?? 0;
+    if (/^\s*themeVariables\s*:/.test(line)) {
+      variablesIndent = indentation;
+      return line;
+    }
+    if (
+      variablesIndent >= 0 &&
+      line.trim() &&
+      indentation <= variablesIndent &&
+      !line.trimStart().startsWith('#')
+    )
+      variablesIndent = -1;
+    if (variablesIndent < 0) return line;
+    return line.replace(
+      /^(\s*[\w-]+\s*:\s*)(#[\da-f]{6}|#[\da-f]{3})(\s*(?:#.*)?)$/i,
+      "$1'$2'$3",
+    );
+  });
+  return `${bom}${match[1]}${normalized.join('\n')}${match[3]}${content.slice(match[0].length)}`;
+}
+
 export function renderDiagram(source: string, isCurrent: () => boolean) {
   // Mermaid has shared configuration: run one render at a time, skipping obsolete work.
   const result = queue.then(async () => {
@@ -48,7 +77,7 @@ export function renderDiagram(source: string, isCurrent: () => boolean) {
     try {
       const { svg, diagramType } = await mermaid.render(
         `mermaid6-${++counter}`,
-        source.replace(/^\uFEFF/, ''),
+        normalizeThemeColorsForRender(source).replace(/^\uFEFF/, ''),
         container,
       );
       if (!isCurrent()) return null;

@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 import DiagramPreview from './components/DiagramPreview';
 import Icon from './components/Icon';
 import { getSource, inks, models } from './models';
+import { usePreferences } from './preferences';
 
 const examples: {
   title: string;
@@ -27,6 +28,7 @@ const examples: {
 ];
 
 export default function App() {
+  const { t } = usePreferences();
   const [selected, setSelected] = useState(0);
   const [inkIndex, setInkIndex] = useState(0);
   const [sourceOpen, setSourceOpen] = useState(false);
@@ -92,50 +94,44 @@ export default function App() {
   return (
     <div className="app" style={variables}>
       <a className="skip-link" href="#workspace">
-        Aller au diagramme
+        {t('skipContent')}
       </a>
       <header className="site-header">
-        <a className="brand" href="/" aria-label="Mermaid6, accueil">
+        <a className="brand" href="/" aria-label={t('homeLabel')}>
           <img src="/favicon.svg" alt="" width="32" height="32" />
           <span>
             Mermaid<span className="brand-six">6</span>
           </span>
         </a>
-        <nav aria-label="Navigation principale">
-          <a href="/examples">Les exemples</a>
-          <a href="#about">Le projet</a>
+        <nav aria-label={t('mainNavigation')}>
+          <a href="/examples">{t('examples')}</a>
+          <a href="#about">{t('project')}</a>
         </nav>
         <a className="button primary header-cta" href="/editor">
-          Ouvrir l’éditeur <Icon name="arrow" />
+          {t('openEditor')} <Icon name="arrow" />
         </a>
       </header>
       <main>
         <section className="hero" aria-labelledby="hero-title">
-          <span className="hero-eyebrow">
-            VOS IDÉES MÉRITENT D’ÊTRE COMPRISES
-          </span>
+          <span className="hero-eyebrow">{t('heroEyebrow')}</span>
           <h1 id="hero-title">
-            Un peu de texte.
+            {t('heroTitleA')}
             <br />
-            <span>Tout devient plus clair.</span>
+            <span>{t('heroTitleB')}</span>
           </h1>
-          <p>
-            Un processus, une conversation, un système.
-            <br />
-            Donnez forme à vos idées avec les diagrammes Mermaid.
-          </p>
+          <p>{t('heroIntro')}</p>
           <div className="hero-actions">
             <a className="button primary" href="#examples">
-              Explorer les exemples <Icon name="arrow" />
+              {t('exploreExamples')} <Icon name="arrow" />
             </a>
             <a className="hero-link" href="#about">
-              Un projet ouvert, pour tous
+              {t('openProject')}
             </a>
           </div>
           <div className="hero-details">
-            <span>Sans compte</span>
+            <span>{t('noAccount')}</span>
             <span>Open source · MIT</span>
-            <span>Dans votre navigateur</span>
+            <span>{t('inBrowser')}</span>
           </div>
         </section>
         <section
@@ -191,7 +187,7 @@ export default function App() {
             </div>
           )}
           <a className="catalogue-home-link" href="/examples">
-            Explorer le catalogue complet <Icon name="arrow" />
+            {t('fullCatalogue')} <Icon name="arrow" />
           </a>
         </section>
         <section
