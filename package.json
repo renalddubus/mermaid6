@@ -1,6 +1,6 @@
 {
   "name": "mermaid6",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Un espace open source pour créer et exporter des diagrammes Mermaid.",
   "license": "MIT",
