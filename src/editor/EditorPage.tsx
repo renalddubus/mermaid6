@@ -267,10 +267,6 @@ export default function EditorPage({
           <button className="button" onClick={() => setCatalogueOpen(true)}>
             {t('Browse examples')}
           </button>
-          <button className="button primary" onClick={download}>
-            <Icon name="export" />
-            {t('Download .mmd')}
-          </button>
         </div>
         <SettingsButton />
       </header>
@@ -404,17 +400,23 @@ export default function EditorPage({
               </div>
             </div>
             <footer className="live-preview-footer">
-              <button
-                className="button primary"
-                disabled={!current || !lastValid.svg}
-                onClick={() => {
-                  setExportError('');
-                  setExportOpen(true);
-                }}
-              >
-                {t('Export image')}
-                <Icon name="export" />
-              </button>
+              <div className="preview-export-actions">
+                <button className="button primary" onClick={download}>
+                  <Icon name="export" />
+                  {t('Download .mmd')}
+                </button>
+                <button
+                  className="button primary"
+                  disabled={!current || !lastValid.svg}
+                  onClick={() => {
+                    setExportError('');
+                    setExportOpen(true);
+                  }}
+                >
+                  {t('Export image')}
+                  <Icon name="export" />
+                </button>
+              </div>
               <div
                 className="zoom-tools"
                 role="group"
