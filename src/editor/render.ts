@@ -112,9 +112,54 @@ export function renderDiagram(source: string, isCurrent: () => boolean) {
   return result;
 }
 
-export function describeError(error: unknown) {
+export function describeError(error: unknown, source?: string) {
   const message = error instanceof Error ? error.message : String(error);
-  const line = message.match(/(?:line|ligne)\s+(\d+)/i)?.[1];
+  const hash =
+    error && typeof error === 'object' && 'hash' in error
+      ? (
+          error as {
+            hash?: { token?: string | null; loc?: { first_line?: number } };
+          }
+        ).hash
+      : undefined;
+  const reported = message.match(/(?:line|ligne)\s+(\d+)/i)?.[1];
+  let line =
+    reported ??
+    (hash?.loc?.first_line ? String(hash.loc.first_line) : undefined);
+  if (line && source) {
+    const normalized = source.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+    // Mermaid's grammar sees the body without YAML frontmatter. Flowcharts
+    // retain comments; the other grammars remove comments and leading blanks.
+    const header = normalized.match(/^---\n[\s\S]*?\n---(?:\n|$)/)?.[0] ?? '';
+    const offset = header.split('\n').length - 1;
+    let lines = normalized
+      .slice(header.length)
+      .split('\n')
+      .map((text, index) => ({ text, number: offset + index + 1 }));
+    if (hash?.token === null) {
+      // Positioned metadata errors already use original source coordinates.
+      line = String(Math.min(Number(line), normalized.split('\n').length));
+    } else {
+      const body = normalized
+        .slice(header.length)
+        .replace(/^\s*%%(?!{)[^\n]+\n?/gm, '')
+        .trimStart();
+      if (!/^(?:flowchart|graph)\b/.test(body)) {
+        const retained: typeof lines = [];
+        for (const entry of lines) {
+          if (/^\s*%%(?!{).+/.test(entry.text)) {
+            while (retained.length && !retained.at(-1)!.text.trim())
+              retained.pop();
+          } else retained.push(entry);
+        }
+        while (retained.length > 1 && !retained[0].text.trim())
+          retained.shift();
+        lines = retained;
+      }
+      const index = Math.max(0, Math.min(Number(line) - 1, lines.length - 1));
+      line = String(lines[index]?.number ?? normalized.split('\n').length);
+    }
+  }
   return {
     title: line
       ? 'Syntax error on line {line}'

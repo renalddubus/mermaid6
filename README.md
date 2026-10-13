@@ -14,6 +14,7 @@ Write Mermaid syntax with CodeMirror, see the result update in real time, explor
 ## What Mermaid6 offers
 
 - A live Mermaid 12 editor with syntax highlighting and useful error feedback.
+- Context-aware Mermaid suggestions, editable code blocks, existing identifier completion, and clickable syntax errors. Use the Suggestions button or Ctrl+Space, then Tab to move between block fields.
 - A catalogue of 35 editable examples covering flowcharts, sequences, states, classes, ER diagrams, journeys, timelines, and more.
 - SVG and PNG image export at multiple resolutions, with white, dark, transparent, or custom backgrounds.
 - `.mmd` file import and download while preserving the original filename.

@@ -1,5 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useImperativeHandle, useRef, type Ref } from 'react';
 import { EditorView, basicSetup } from 'codemirror';
+import { Decoration } from '@codemirror/view';
+import { autocompletion, startCompletion } from '@codemirror/autocomplete';
 import { Compartment, EditorState } from '@codemirror/state';
 import { StreamLanguage } from '@codemirror/language';
 import {
@@ -12,6 +14,12 @@ import {
 } from '@codemirror/search';
 import { usePreferences } from '../preferences';
 import { copy } from '../i18n/copy';
+import { mermaidCompletions } from './completions';
+
+export type CodeEditorHandle = {
+  showSuggestions: () => void;
+  goToLine: (line: number) => void;
+};
 
 const mermaidLanguage = StreamLanguage.define({
   token(stream) {
@@ -37,17 +45,47 @@ const mermaidLanguage = StreamLanguage.define({
 export default function CodeEditor({
   value,
   onChange,
+  errorLine,
+  ref,
 }: {
   value: string;
   onChange: (value: string) => void;
+  errorLine?: number;
+  ref?: Ref<CodeEditorHandle>;
 }) {
   const { t, tx } = usePreferences();
   const localization = useRef(new Compartment());
+  const assistance = useRef(new Compartment());
+  const diagnostics = useRef(new Compartment());
   const container = useRef<HTMLDivElement>(null);
   const view = useRef<EditorView | null>(null);
   const initial = useRef(value);
   const syncing = useRef(false);
   const callback = useRef(onChange);
+  useImperativeHandle(
+    ref,
+    () => ({
+      showSuggestions() {
+        const editor = view.current;
+        if (!editor) return;
+        editor.focus();
+        startCompletion(editor);
+      },
+      goToLine(number) {
+        const editor = view.current;
+        if (!editor || !Number.isInteger(number) || number < 1) return;
+        const line = editor.state.doc.line(
+          Math.min(number, editor.state.doc.lines),
+        );
+        editor.dispatch({
+          selection: { anchor: line.from, head: line.to },
+          effects: EditorView.scrollIntoView(line.from, { y: 'center' }),
+        });
+        editor.focus();
+      },
+    }),
+    [],
+  );
   useEffect(() => {
     callback.current = onChange;
   }, [onChange]);
@@ -62,6 +100,8 @@ export default function CodeEditor({
           mermaidLanguage,
           EditorView.lineWrapping,
           localization.current.of([]),
+          assistance.current.of([]),
+          diagnostics.current.of([]),
           EditorView.updateListener.of((update) => {
             if (update.docChanged && !syncing.current)
               callback.current(update.state.doc.toString());
@@ -75,6 +115,33 @@ export default function CodeEditor({
       view.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    view.current?.dispatch({
+      effects: assistance.current.reconfigure(
+        autocompletion({
+          override: [mermaidCompletions(t)],
+        }),
+      ),
+    });
+  }, [t]);
+
+  useEffect(() => {
+    view.current?.dispatch({
+      effects: diagnostics.current.reconfigure(
+        EditorView.decorations.of((editor) => {
+          if (!errorLine || errorLine > editor.state.doc.lines)
+            return Decoration.none;
+          return Decoration.set([
+            Decoration.line({
+              class: 'cm-error-line',
+              attributes: { 'data-error-line': String(errorLine) },
+            }).range(editor.state.doc.line(errorLine).from),
+          ]);
+        }),
+      ),
+    });
+  }, [errorLine]);
 
   useEffect(() => {
     const editor = view.current;

@@ -7,7 +7,7 @@ Updated 24 September 2026. Mermaid6 supports English, French, Spanish, and Germa
 - `src/i18n/copy.ts`: English messages with French, Spanish, and German translations. Use `t()` for statically known messages and `tx()` for translated metadata and application errors.
 - `src/i18n/catalogue.ts`: example names, descriptions, categories, and customization notes.
 - `src/preferences.tsx`: settings, navigation, landing-page headings, and route-loading messages; preference resolution and persistence.
-- [Translation inventory](strings-complet.json): a snapshot of all 416 messages with `key`, `en`, `fr`, `es`, and `de` fields. The source dictionaries remain authoritative.
+- [Translation inventory](strings-complet.json): a snapshot of all 424 messages with `key`, `en`, `fr`, `es`, and `de` fields. The source dictionaries remain authoritative.
 
 ## Adding interface text
 

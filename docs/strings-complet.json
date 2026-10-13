@@ -2910,5 +2910,61 @@
     "fr": "Explorer le catalogue complet",
     "es": "Explorar el catálogo completo",
     "de": "Vollständigen Katalog öffnen"
+  },
+  {
+    "key": "Suggestions",
+    "en": "Suggestions",
+    "fr": "Suggestions",
+    "es": "Sugerencias",
+    "de": "Vorschläge"
+  },
+  {
+    "key": "Diagram type",
+    "en": "Diagram type",
+    "fr": "Type de diagramme",
+    "es": "Tipo de diagrama",
+    "de": "Diagrammtyp"
+  },
+  {
+    "key": "Direction",
+    "en": "Direction",
+    "fr": "Direction",
+    "es": "Dirección",
+    "de": "Richtung"
+  },
+  {
+    "key": "Insert a Mermaid block",
+    "en": "Insert a Mermaid block",
+    "fr": "Insérer un bloc Mermaid",
+    "es": "Insertar un bloque Mermaid",
+    "de": "Mermaid-Block einfügen"
+  },
+  {
+    "key": "Keyword",
+    "en": "Keyword",
+    "fr": "Mot-clé",
+    "es": "Palabra clave",
+    "de": "Schlüsselwort"
+  },
+  {
+    "key": "Existing identifier",
+    "en": "Existing identifier",
+    "fr": "Identifiant existant",
+    "es": "Identificador existente",
+    "de": "Vorhandener Bezeichner"
+  },
+  {
+    "key": "Go to line {line}",
+    "en": "Go to line {line}",
+    "fr": "Aller à la ligne {line}",
+    "es": "Ir a la línea {line}",
+    "de": "Zu Zeile {line} gehen"
+  },
+  {
+    "key": "Ctrl+Space: suggestions · Tab: next field or leave · ⌘/Ctrl Z: undo",
+    "en": "Ctrl+Space: suggestions · Tab: next field or leave · ⌘/Ctrl Z: undo",
+    "fr": "Ctrl+Espace : suggestions · Tab : champ suivant ou quitter · ⌘/Ctrl Z : annuler",
+    "es": "Ctrl+Espacio: sugerencias · Tab: siguiente campo o salir · ⌘/Ctrl Z: deshacer",
+    "de": "Strg+Leertaste: Vorschläge · Tab: nächstes Feld oder verlassen · ⌘/Strg Z: rückgängig"
   }
 ]

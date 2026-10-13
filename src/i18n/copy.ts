@@ -888,6 +888,30 @@ export const copy = {
   ],
   'on line': ['à la ligne', 'en la línea', 'in Zeile'],
   Completions: ['Suggestions', 'Sugerencias', 'Vervollständigungen'],
+  Suggestions: ['Suggestions', 'Sugerencias', 'Vorschläge'],
+  'Diagram type': ['Type de diagramme', 'Tipo de diagrama', 'Diagrammtyp'],
+  Direction: ['Direction', 'Dirección', 'Richtung'],
+  'Insert a Mermaid block': [
+    'Insérer un bloc Mermaid',
+    'Insertar un bloque Mermaid',
+    'Mermaid-Block einfügen',
+  ],
+  Keyword: ['Mot-clé', 'Palabra clave', 'Schlüsselwort'],
+  'Existing identifier': [
+    'Identifiant existant',
+    'Identificador existente',
+    'Vorhandener Bezeichner',
+  ],
+  'Go to line {line}': [
+    'Aller à la ligne {line}',
+    'Ir a la línea {line}',
+    'Zu Zeile {line} gehen',
+  ],
+  'Ctrl+Space: suggestions · Tab: next field or leave · ⌘/Ctrl Z: undo': [
+    'Ctrl+Espace : suggestions · Tab : champ suivant ou quitter · ⌘/Ctrl Z : annuler',
+    'Ctrl+Espacio: sugerencias · Tab: siguiente campo o salir · ⌘/Ctrl Z: deshacer',
+    'Strg+Leertaste: Vorschläge · Tab: nächstes Feld oder verlassen · ⌘/Strg Z: rückgängig',
+  ],
 } as const satisfies Record<string, readonly [string, string, string]>;
 
 export type CopyKey = keyof typeof copy;

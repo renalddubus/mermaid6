@@ -4,7 +4,7 @@ import Icon from '../components/Icon';
 import { getSource, inks } from '../models';
 import { exampleForSource, type DiagramExample } from '../catalogue';
 import CatalogueDialog from '../components/CatalogueDialog';
-import CodeEditor from './CodeEditor';
+import CodeEditor, { type CodeEditorHandle } from './CodeEditor';
 import { readAppearance, colorFields } from './appearance';
 import { describeError, MAX_SOURCE_LENGTH, renderDiagram } from './render';
 import { writeDraft, type Draft } from './drafts';
@@ -36,6 +36,7 @@ export default function EditorPage({
   } | null>(null);
   const [storageError, setStorageError] = useState(storageWarning);
   const fileInput = useRef<HTMLInputElement>(null);
+  const codeEditor = useRef<CodeEditorHandle>(null);
   const importSequence = useRef(0);
   const [saved, setSaved] = useState(source);
   const [lastValid, setLastValid] = useState({ source: '', svg: '' });
@@ -79,6 +80,9 @@ export default function EditorPage({
   }, [source]);
   const current = lastValid.source === source;
   const error = attempt?.source === source ? attempt.error : null;
+  const errorLine = error?.line
+    ? Math.min(Number(error.line), source.split(/\r\n?|\n/).length)
+    : undefined;
   const status = current
     ? 'Preview up to date'
     : error
@@ -95,7 +99,8 @@ export default function EditorPage({
           setAttempt({ source, error: null });
         })
         .catch((cause) => {
-          if (!cancelled) setAttempt({ source, error: describeError(cause) });
+          if (!cancelled)
+            setAttempt({ source, error: describeError(cause, source) });
         });
     }, 300);
     return () => {
@@ -326,17 +331,34 @@ export default function EditorPage({
                 <Icon name="code" />
                 {t('Mermaid source')}
               </h2>
-              <button
-                className="icon-button"
-                onClick={() => void copy()}
-                aria-label={t('Copy source')}
-              >
-                <Icon name="copy" />
-              </button>
+              <div className="code-actions">
+                <button
+                  className="button writing-suggestions"
+                  onClick={() => codeEditor.current?.showSuggestions()}
+                >
+                  {t('Suggestions')}
+                </button>
+                <button
+                  className="icon-button"
+                  onClick={() => void copy()}
+                  aria-label={t('Copy source')}
+                >
+                  <Icon name="copy" />
+                </button>
+              </div>
             </header>
-            <CodeEditor value={source} onChange={setSource} />
+            <CodeEditor
+              ref={codeEditor}
+              value={source}
+              onChange={setSource}
+              errorLine={errorLine}
+            />
             <footer className="code-footer">
-              <span id="code-help">{t('Tab to leave · ⌘/Ctrl Z to undo')}</span>
+              <span id="code-help">
+                {t(
+                  'Ctrl+Space: suggestions · Tab: next field or leave · ⌘/Ctrl Z: undo',
+                )}
+              </span>
               <span
                 className={
                   source.length > MAX_SOURCE_LENGTH ? 'over-limit' : ''
@@ -363,7 +385,24 @@ export default function EditorPage({
             </header>
             {error && (
               <div className="render-error" role="alert">
-                <strong>{tx(error.title, { line: error.line ?? '' })}</strong>
+                {errorLine ? (
+                  <strong>
+                    <button
+                      className="error-line-link"
+                      aria-label={t('Go to line {line}', { line: errorLine })}
+                      onClick={() => {
+                        setMobilePanel('code');
+                        requestAnimationFrame(() =>
+                          codeEditor.current?.goToLine(errorLine),
+                        );
+                      }}
+                    >
+                      {tx(error.title, { line: errorLine })}
+                    </button>
+                  </strong>
+                ) : (
+                  <strong>{tx(error.title, { line: '' })}</strong>
+                )}
                 <p>
                   {t('Your text is preserved.')}
                   {lastValid.svg && t('The last valid preview is shown below.')}
